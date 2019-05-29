@@ -5,7 +5,7 @@ from django.core import serializers
 from django.template.loader import render_to_string
 
 export = []
-with open('export.json', 'r') as myfile:
+with open('exportNew.json', 'r') as myfile:
     export = json.load(myfile)
 
 

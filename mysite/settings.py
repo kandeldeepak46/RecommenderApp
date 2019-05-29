@@ -36,9 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'crispy_forms',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
-    'example.apps.ExampleConfig',
+    'example.apps.ExampleConfig'
 ]
 
 MIDDLEWARE = [
@@ -126,3 +127,6 @@ STATICFILES_DIRS = [
     '/var/www/static/',
 ]
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+LOGIN_REDIRECT_URL = 'index'

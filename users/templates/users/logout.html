@@ -1,5 +1,4 @@
 
-{% load crispy_forms_tags %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,15 +11,9 @@
 <body>
     
     <div class="container" style="position:absolute; width:80%; left:20%; margin:2em;">
-        <div class="signup">
-            <form method = "POST">
-                {% csrf_token %}
-                {{ form|crispy }}
-                <button type="submit">Sign Up</button>
-            </form>  
-        </div> 
-        <div>
-            <h6>Already have an Account?</h6> <a href="{% url 'login' %}"> Sign in</a>
+        <h2> You have been logged out</h2>    
+    <div>
+            <h6>Login in again</h6> <a href="{% url 'login' %}"> Sign in</a>
         </div>
     </div>
 
