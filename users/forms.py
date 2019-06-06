@@ -11,13 +11,14 @@ ROLE_CHOICES= [
 
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
-    role = forms.CharField(label='Do you want to sign in as customer or shopkeeper?', widget=forms.Select(choices=ROLE_CHOICES))
 
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
 
 class ProfileForm(forms.ModelForm):
+    role = forms.CharField(label='Do you want to sign in as customer or shopkeeper?', widget=forms.Select(choices=ROLE_CHOICES))
+    
     class Meta:
         model = Profile
         fields = ['role']
