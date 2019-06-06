@@ -16,6 +16,7 @@
             <form method = "POST">
                 {% csrf_token %}
                 {{ form|crispy }}
+                {{ profile_form|crispy }}
                 <button type="submit">Sign Up</button>
             </form>  
         </div> 

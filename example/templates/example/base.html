@@ -68,6 +68,10 @@
         </div>
     </nav>
 
+    {% ifequal request.user.dropdown 'Shopkeeper' %}
+        <h1> You are shopkeeper </h1>
+    {% endifequal %}
+
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">
