@@ -81,6 +81,45 @@
 
 
         </div>
+        <br><hr/>
+        <div class="ratingView">
+            <h5>Give this book a rating </h5>
+            <div class="container">
+                <form class="rating">
+                    <label>
+                      <input type="radio" name="stars" value="1" />
+                      <span class="icon">★</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="stars" value="2" />
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="stars" value="3" />
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>   
+                    </label>
+                    <label>
+                      <input type="radio" name="stars" value="4" />
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="stars" value="5" />
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                      <span class="icon">★</span>
+                    </label>
+                  </form>
+            </div>
+        </div>
+    
         
 
     </div>
@@ -89,6 +128,8 @@
     
     <meta id="my-data" data-name="{{b.rating}}" >
 
+
+    
 {% endblock %}
 
 
@@ -97,4 +138,33 @@
     <script src="detail.js"></script>
     <script src="main.js"></script>
 
+{% endblock %}
+
+
+{% block addBook %}
+    {% if shopkeeper == 'yes' %}
+    <li class="nav-item">
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#exampleModal" > Add Book </a>
+    </li>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+            ...
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

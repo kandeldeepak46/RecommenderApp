@@ -8,7 +8,6 @@ from .forms import UserRegisterForm, ProfileForm
 # Create your views here.
 
 def register(request):
-    print(request.user.profile.role)
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
         profile_form = ProfileForm(request.POST)

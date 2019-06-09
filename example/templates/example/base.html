@@ -14,6 +14,7 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    
 
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
@@ -50,10 +51,14 @@
                 <li class="nav-item">
                     <h4 style="font-style:italic; padding-top:0.5rem; padding-right:1.3em;">Hi {{request.user.username}}</h4>
                 </li>
+                {% block addBook %}
+
+                {% endblock %}
                 <li class="nav-item">
-                   
                     <a class="nav-link" href="{% url 'logout'%} ">Logout</a>
                 </li>
+                
+
                 {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'login'%} ">Login</a>
