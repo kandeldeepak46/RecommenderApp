@@ -1,6 +1,8 @@
 
 {% extends "example/base.html" %}
 
+{% load static %}
+
 {% block body %}
    
     <div class="container">
@@ -86,31 +88,32 @@
         <div class="ratingView">
             <h5>Give this book a rating </h5>
             <div class="container">
-                <form class="r">
+                <form class="r" action="{% url 'detail' b.ISBN %}" method="POST">
+                    {% csrf_token %}
                     <label>
-                      <input type="radio" name="stars" value="1" />
+                      <input type="radio" name="stars" value="1" onclick="this.form.submit()"/>
                       <span class="icon">★</span>
                     </label>
                     <label>
-                      <input type="radio" name="stars" value="2" />
+                      <input type="radio" name="stars" value="2" onclick="this.form.submit()"/>
                       <span class="icon">★</span>
                       <span class="icon">★</span>
                     </label>
                     <label>
-                      <input type="radio" name="stars" value="3" />
+                      <input type="radio" name="stars" value="3" onclick="this.form.submit()"/>
                       <span class="icon">★</span>
                       <span class="icon">★</span>
                       <span class="icon">★</span>   
                     </label>
                     <label>
-                      <input type="radio" name="stars" value="4" />
+                      <input type="radio" name="stars" value="4" onclick="this.form.submit()"/>
                       <span class="icon">★</span>
                       <span class="icon">★</span>
                       <span class="icon">★</span>
                       <span class="icon">★</span>
                     </label>
                     <label>
-                      <input type="radio" name="stars" value="5" />
+                      <input type="radio" name="stars" value="5" onclick="this.form.submit()"/>
                       <span class="icon">★</span>
                       <span class="icon">★</span>
                       <span class="icon">★</span>
@@ -124,9 +127,10 @@
 
         <div class="reviewSection">
             <h5> Add a review </h5>
-            <form>
+            <form action="{% url 'detail' b.ISBN %}" method="POST" class="form"> 
+                {% csrf_token %}
                 <div class="form-group">
-                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                    <textarea name='review' class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">Post</button>
             </form>
@@ -135,17 +139,42 @@
         
 
     </div>
-    
 
-    
     <meta id="my-data" data-name="{{b.rating}}" >
 
+    <script> 
+        let isbn = '{{b.ISBN}}';
+        let detail_url = "{% url 'detail' b.ISBN %}"
+        // $(document).ready(function() {
+        //     console.log(detail_url);
+        //     var xhr = new XMLHttpRequest();
+        //     xhr.open("POST", `http://localhost:8000${detail_url}`, true);
+        //     xhr.setRequestHeader('Content-Type', 'application/json');
+        //     xhr.send(JSON.stringify({
+        //         click: true
+        //     }));
+        // });
 
-    
+    </script>
+
 {% endblock %}
 
 
 {% block extrajs %}
+
+    <!-- <script type="text/javascript">
+        console.log('{{b.ISBN}}');
+        // $(document).ready(function() {
+        // console.log(b.ISBN);
+        // // $.ajax({
+        // //   type: "POST",
+        // //   url: "{% url 'detail' b.ISBN %}",
+        // //   data: { "click" : "true" }
+        // //  });
+        // });
+
+    </script> -->
+
 
     <script src="detail.js"></script>
     <script src="main.js"></script>

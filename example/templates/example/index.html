@@ -1,6 +1,8 @@
 
 {% extends "example/base.html" %}
 
+{% load static %}
+
 {% block body %}
 
 <div class="top-content">
@@ -74,12 +76,12 @@
             </button>
             </div>
             <div class="modal-body">
-                <form>
+                <form action="{% url 'index' %}" method="POST" class="form" >
                     <div class="form-group">
                         <label for="exampleFormControlInput0">Book Photo </label>
                         <div class="avatar-upload">
                             <div class="avatar-edit">
-                                <input type='file' id="imageUpload" accept=".png, .jpg, .jpeg" />
+                                <input type='file' name="Image-URL-L" id="imageUpload" accept=".png, .jpg, .jpeg" />
                                 <label for="imageUpload"></label>
                             </div>
                             <div class="avatar-preview">
@@ -89,19 +91,20 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        {% csrf_token %}
                         <label for="exampleFormControlInput1">Book Name</label>
-                        <input type="text" class="form-control" id="exampleFormControlInput1"
+                        <input type="text" class="form-control" name="Book-Title" id="exampleFormControlInput1"
                             placeholder="">
                             <label for="exampleFormControlInput1">Author</label>
-                        <input type="text" class="form-control" id="exampleFormControlInput1"
+                        <input type="text" class="form-control" name="Book-Author" id="exampleFormControlInput1"
                             placeholder="">
                             <label for="exampleFormControlInput1">ISBN</label>
-                        <input type="text" class="form-control" id="exampleFormControlInput1"
+                        <input type="text" class="form-control" name="ISBN" id="exampleFormControlInput1"
                             placeholder="">
                     </div>
                     <div class="form-group">
                         <label for="exampleFormControlSelect1">Genre</label>
-                        <select class="form-control" id="exampleFormControlSelect1">
+                        <select class="form-control" name="genre" id="exampleFormControlSelect1">
                             <option>Fiction</option>
                             <option>Science Fiction</option>
                             <option>Comedy</option>
@@ -112,14 +115,12 @@
                    
                     <div class="form-group">
                         <label for="exampleFormControlTextarea1">Description</label>
-                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                        <textarea class="form-control" name="description" id="exampleFormControlTextarea1" rows="3"></textarea>
                     </div>
+
+                    <button type="submit" class="btn btn-primary">Save changes</button>
                 </form>
                 
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
             </div>
         </div>
         </div>
