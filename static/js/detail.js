@@ -2,7 +2,6 @@
 // send click flag on detail page load
 
   $(document).ready(function() {
-    console.log(detail_url);
     function getCookie(name) {
       var cookieValue = null;
       if (document.cookie && document.cookie != '') {
@@ -34,6 +33,7 @@
     // }), 10000);
 
     setTimeout(function(){ 
+      console.log(detail_url)
       fetch("detail_url", {
         method: "POST", 
         credentials: "same-origin",
@@ -43,7 +43,7 @@
             "Content-Type": "application/json",
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify({clicked: 'clicked'})
+        body: JSON.stringify({clicked: 'clicked', ISBN: isbn})
       }).then(res => {
         console.log("Request complete! response:", res);
       })
