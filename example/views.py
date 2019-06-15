@@ -111,10 +111,11 @@ def detail(request, isbn):
             # print('________________________________________________________________________')
 
             # bookClick = click.get(clicked, 0)
-        
+            
             if (click['clicked'] == 'clicked'):
                 user_id = request.user.id + 278858
-                book_id = isbn
+                book_id = click['ISBN']
+
                 new_clicks = 1
                 new_clicks_rating=get_clicks_rating(new_clicks)
                 x=mycol.find({"user_id":user_id,"activity.book_id":book_id},{"activity.$.activity":1,"_id":0})
