@@ -10,19 +10,23 @@
         <div class="row" style= "position:relative; width:70%; margin-top:4rem; left:15% ">
 
             <div class="col-sm-4">
-                <img class="card-img-top" src="{{b.imageUrlL}}" alt="Card image cap"
+                <img class="card-img-top" src="{{b.imageURL}}" alt="Card image cap"
                     style="width:200; height:300;">
+                <button class="btn btn-primary" style="margin:1.5em;"
+                    onClick="sendReadIt()"    
+                > I've READ IT
+                </button>
             </div>
 
             <div class="col-sm-8">
                 <h1> {{b.bookTitle}} </h1>
                 <h5> by {{b.bookAuthor}}</h5>
-                <p> ISBN: {{b.ISBN}} Published in {{b.yearOfPublication}} <br/> {{b.genre}}</p>
+                <p> ISBN: {{b.ISBN}} Published in {{b.publicationYear}} <br/> Genre to be sent</p>
                 <div class="rating">
                     <div class="stars-outer">
                         <div class="stars-inner"></div>
                     </div>
-                    {{b.rating}}
+                    <!-- {{b.averageRating}} -->
                 </div>
                 <hr/>
                 {{b.description}}
@@ -43,7 +47,7 @@
                                 {% if forloop.first %}
                                 <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3 active">
                                     <div class="card" style="width: 10rem;">
-                                        <img class="card-img-top" src="{{books.imageUrlM}}" alt="Card image cap"
+                                        <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
                                             style="width:120px; height:180px; align-self: center">
                                         <div class="card-body">
                                             <p style="font-size:10px;" class="card-title">{{books.bookTitle}}</p>
@@ -55,7 +59,7 @@
                                 {% else %}
                                 <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3">
                                     <div class="card" style="width: 10rem;">
-                                        <img class="card-img-top" src="{{books.imageUrlM}}" alt="Card image cap"
+                                        <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
                                             style="width:120px; height:180px; align-self: center">
                                         <div class="card-body">
                                             <p style="font-size:10px;" class="card-title">{{books.bookTitle}}</p>
@@ -140,7 +144,7 @@
 
     </div>
 
-    <meta id="my-data" data-name="{{b.rating}}" >
+    <meta id="my-data" data-name="{{b.averageRating}}" >
 
     <script> 
         let isbn = '{{b.ISBN}}';

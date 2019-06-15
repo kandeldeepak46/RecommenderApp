@@ -9,32 +9,34 @@
     <div class="container">
         <div id="carousel-example" class="carousel slide" data-ride="carousel">
             <div class="carousel-inner row w-100 mx-auto" role="listbox">
-                {% for books in e %}
+                {% for books in rec_books %}
+                    
                 {% if forloop.first %}
-                <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3 active">
-                    <div class="card" style="width: 15rem;">
-                        <img class="card-img-top" src="{{books.imageUrlL}}" alt="Card image cap"
-                            style="width:200; height:300;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{books.bookTitle}}</h5>
-                            <p class="card-text">By {{books.bookAuthor}} </p>
-                            <a href= "{% url 'detail' books.ISBN %} "> More </a>
+                    <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3 active">
+                        <div class="card" style="width: 15rem;">
+                            <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
+                                style="width:200; height:300;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{books.bookTitle}}</h5>
+                                <p class="card-text">By {{books.bookAuthor}} </p>
+                                <a href= "{% url 'detail' books.ISBN %} "> More </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                {% else %}
-                <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="card" style="width: 15rem;">
-                        <img class="card-img-top" src="{{books.imageUrlL}}" alt="Card image cap"
-                            style="width:200; height:300;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{books.bookTitle}}</h5>
-                            <p class="card-text">By {{books.bookAuthor}}</p>
-                            <a href= "{% url 'detail' books.ISBN %} "> More </a>
+                    {% else %}
+                    <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="card" style="width: 15rem;">
+                            <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
+                                style="width:200; height:300;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{books.bookTitle}}</h5>
+                                <p class="card-text">By {{books.bookAuthor}}</p>
+                                <a href= "{% url 'detail' books.ISBN %} "> More </a>
+                            </div>
                         </div>
                     </div>
-                </div>
                 {% endif %}
+               
 
                 {% endfor %}
 

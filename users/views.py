@@ -4,10 +4,16 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .forms import UserRegisterForm, ProfileForm
 
+from pymongo import MongoClient
+
+client = MongoClient("mongodb://110.34.31.28:27017")
+
+
 
 # Create your views here.
 
 def register(request):
+    print("yo")
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
         profile_form = ProfileForm(request.POST)
@@ -19,6 +25,7 @@ def register(request):
             profile.save()
             username = form.cleaned_data.get('username')
             messages.success(request, f'Account is created {username}')
+            
             return redirect('index') 
     else:
         form = UserRegisterForm()

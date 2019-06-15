@@ -10,7 +10,9 @@ from pymongo import MongoClient
 
 import ast
 
-client = MongoClient("mongodb://192.168.0.9:27017")
+from mysite import rec_books
+
+client = MongoClient("mongodb://110.34.31.28:27017")
 
 export = []
 with open('exportNew.json', 'r') as myfile:
@@ -21,6 +23,8 @@ bookDetail = ''
 
 # Create your views here.
 def index(request):
+
+    print(rec_books[0])
 
     global export
 
@@ -54,6 +58,18 @@ def index(request):
         #     }
         # db.test_collection.insert(dict)
 
+    if request.user.is_authenticated:
+        userId = request.user.id + 278858
+
+        print (userId)
+
+        db=client.test_db
+        dict={
+            'userId': userId
+            }
+        db.new_user.insert(dict)
+
+
 
     if request.user.is_authenticated:
         if (request.user.profile.role == 'Shopkeeper'):
@@ -64,7 +80,7 @@ def index(request):
         shopkeeper = 'no'
 
     
-    return render(request, 'example/index.html', {'e': export, 'shopkeeper': shopkeeper})
+    return render(request, 'example/index.html', {'rec_books': rec_books, 'shopkeeper': shopkeeper})
 
 
 def detail(request, isbn):
@@ -72,7 +88,7 @@ def detail(request, isbn):
     global export
     global bookDetail
 
-    for book in export:
+    for book in rec_books:
         if book['ISBN'] == isbn:
             bookDetail = book
 
@@ -82,26 +98,33 @@ def detail(request, isbn):
             review = request.POST.get('review')
 
             click = ast.literal_eval(request.body.decode("utf-8"))
+            readIt = ast.literal_eval(request.body.decode("utf-8"))
+            if (readIt == None):
+                print("Yo buddy");    
             clicked = False
             if (click['clicked'] == 'clicked'):
                 clicked = True
+            readIt = readIt['readIt']
+            print(readIt)
+
+            
                 
             # print(request.body.decode("utf-8")) 
             # data = json.loads(request.body.decode("utf-8"))
             # s = json.dumps(data, indent=4, sort_keys=True)
             # print(type(s))
-            userId = request.user.id + 278858
-            print(userId)
+            # userId = request.user.id + 278858
 
-            db=client.test_db
-            dict={
-                'userId': userId,
-                'isbn': isbn,
-                'rating': rating,
-                'review': review,
-                'clicked': clicked,
-                }
-            db.rating_collection.insert(dict)
+            # db=client.test_db
+            # dict={
+            #     'userId': userId,
+            #     'isbn': isbn,
+            #     'rating': rating,
+            #     'review': review,
+            #     'clicked': clicked,
+            #     'readIt': readIt
+            #     }
+            # db.rating_collection.insert(dict)
         
 
     if request.user.is_authenticated:
@@ -114,7 +137,7 @@ def detail(request, isbn):
 
     
     
-    return render(request, 'example/detail.html', {'b': bookDetail, 'e': export, 'shopkeeper': shopkeeper})
+    return render(request, 'example/detail.html', {'b': bookDetail, 'e': rec_books, 'shopkeeper': shopkeeper})
 
 
 
