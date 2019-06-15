@@ -6,7 +6,7 @@ from .forms import UserRegisterForm, ProfileForm
 
 from pymongo import MongoClient
 
-client = MongoClient("mongodb://110.34.31.28:27017")
+# client = MongoClient("mongodb://110.34.31.28:27017")
 
 
 
@@ -24,8 +24,7 @@ def register(request):
             profile.user = user
             profile.save()
             username = form.cleaned_data.get('username')
-            messages.success(request, f'Account is created {username}')
-            
+            messages.success(request, f'Account is created {username}') 
             return redirect('index') 
     else:
         form = UserRegisterForm()
