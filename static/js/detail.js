@@ -18,20 +18,38 @@
       }
       return cookieValue;
     }
+    
+    // setTimeout(fetch("detail_url", {
+    //   method: "POST", 
+    //   credentials: "same-origin",
+    //   headers: {
+    //       "X-CSRFToken": getCookie("csrftoken"),
+    //       "Accept": "application/json",
+    //       "Content-Type": "application/json",
+    //       'X-Requested-With': 'XMLHttpRequest'
+    //   },
+    //   body: JSON.stringify({clicked: 'clicked'})
+    // }).then(res => {
+    //   console.log("Request complete! response:", res);
+    // }), 10000);
 
-    fetch("detail_url", {
-      method: "POST", 
-      credentials: "same-origin",
-      headers: {
-          "X-CSRFToken": getCookie("csrftoken"),
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          'X-Requested-With': 'XMLHttpRequest'
-      },
-      body: JSON.stringify({clicked: 'clicked'})
-    }).then(res => {
-      console.log("Request complete! response:", res);
-    })
+    setTimeout(function(){ 
+      fetch("detail_url", {
+        method: "POST", 
+        credentials: "same-origin",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken"),
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({clicked: 'clicked'})
+      }).then(res => {
+        console.log("Request complete! response:", res);
+      })
+
+     }, 8000);
+    
 });
 
 

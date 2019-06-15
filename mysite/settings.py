@@ -14,7 +14,8 @@ import os
 
 from pymongo import MongoClient
 
-client = MongoClient("mongodb://192.168.0.9:27017")
+# client = MongoClient("mongodb://192.168.0.9:27017")
+
 
 # db=client.test_db
 # dict={'A':[1,2,3,4,5,6]}
