@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 import json
 from django.core import serializers
 from django.template.loader import render_to_string
 
+from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
 from pymongo import MongoClient
@@ -13,12 +14,15 @@ import datetime
 
 import ast
 
-from mysite import rec_books, get_clicks_rating, get_review_rating, get_net_rating
+from mysite import get_recommendation, get_clicks_rating, get_review_rating, get_net_rating, myclient, mydb, mycol
 
 from users.models import Profile
 
+from .forms import *
 
-client = MongoClient("mongodb://110.34.31.28:27017")
+
+client = MongoClient("mongodb://localhost:27017")
+
 
 export = []
 with open('exportNew.json', 'r') as myfile:
@@ -26,11 +30,17 @@ with open('exportNew.json', 'r') as myfile:
 
 bookDetail = ''
 
+rec_books = []
+top_rated_books = []
+
 
 # Create your views here.
 def index(request):
 
     global export
+
+    global rec_books
+    global top_rated_books
 
     # db=client.test_db
     # dict={'A':[1,2,3,4,5,6]}
@@ -40,6 +50,25 @@ def index(request):
 
     # dict={'userid': request.user.id}
     # db.user_collection.insert(dict)
+    myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+    mydb = myclient["majorProject"]
+    mycol = mydb["bookDataset"]
+    x=mycol.aggregate([{"$match":{"average_rating":{"$gt":4}}},{"$sort":{"average_rating":-1}},{"$limit":50},{"$sample":{"size":15}},{"$project":{'_id':0, 'ISBN':'$ISBN', 'genres': '$genres', 'bookTitle': '$Book-Title', 'bookAuthor': '$Book-Author', 'publicationYear': '$Year-Of-Publication', 'publisher': '$Publisher', 'imageURL': '$Image-URL', 'averageRating': '$average_rating', 'description': '$description', 'publicationYear':'$publication_year'} }])
+    top_rated_books=list(x)
+    print('top_rated_books')
+    print(type(top_rated_books))
+    for book in top_rated_books:
+        print('Yo')
+    # x=mycol.aggregate([{"$match":{"average_rating":{"$gt":4}}},{"$sort":{"average_rating":-1}},{"$limit":50},{"$sample":{"size":15}}])
+    # top_rated_books=list(x)
+    # top_rated =mycol.aggregate([{"$match":{"ISBN":{"$in":top_rated_books}}},
+    #                 {"$project":{'_id':0, 'ISBN':'$ISBN', 'genres': '$genres', 'bookTitle': '$Book-Title', 'bookAuthor': '$Book-Author', 'publicationYear': '$Year-Of-Publication', 'publisher': '$Publisher', 'imageURL': '$Image-URL', 'averageRating': '$average_rating', 'description': '$description'} }])
+   
+    # print(list(top_rated))
+    
+    
+    
+    
 
     if request.method == 'POST':
         bookImg = request.POST.get('Image-URL-L')
@@ -62,18 +91,20 @@ def index(request):
 
     if request.user.is_authenticated:
         userId = request.user.id + 278858
-        Profile.objects.filter(user=request.user).update(fifteenBooks=True)
-        
+        rec_books = get_recommendation(userId)
+    else:
+        rec_books = get_recommendation(0)
 
-        print ("-----------------------------Profile Update------------------------------")
+
+        # Profile.objects.filter(user=request.user).update(fifteenBooks=True)
 
         # db=client.test_db
         # dict={
         #     'userId': userId
         #     }
         # db.new_user.insert(dict)
-
-
+    print("rec_books")
+    print(type(rec_books))
 
     if request.user.is_authenticated:
         if (request.user.profile.role == 'Shopkeeper'):
@@ -83,13 +114,34 @@ def index(request):
     else: 
         shopkeeper = 'no'
 
+    if request.method == 'POST': 
+        form = HotelForm(request.POST, request.FILES) 
+        print("-------------------------------FIles -----------------------------")
+        myfile = request.FILES['hotel_Main_Img']
+        fs = FileSystemStorage()
+        filename = fs.save(myfile.name, myfile)
+        uploaded_file_url = fs.url(filename)
+        print(uploaded_file_url)
+        if form.is_valid(): 
+            form.save() 
+            return redirect('index') 
+    else: 
+        form = HotelForm() 
+    return render(request, 'example/index.html', {
+        'form': form,
+        'rec_books': rec_books,
+        'top_rated': top_rated_books,
+        'shopkeeper': shopkeeper,      
+    }) 
+
+
     
-    return render(request, 'example/index.html', {'rec_books': rec_books, 'shopkeeper': shopkeeper})
+    return render(request, 'example/index.html', {'rec_books': rec_books, 'top_rated': top_rated_books, 'shopkeeper': shopkeeper})
 
 
 def detail(request, isbn):
 
-    myclient = pymongo.MongoClient("mongodb://110.34.31.28:27017/")
+    myclient = pymongo.MongoClient("mongodb://localhost:27017/")
     mydb = myclient["majorProject"]
     mycol = mydb["userActivity"]
 
@@ -103,18 +155,27 @@ def detail(request, isbn):
     if request.user.is_authenticated:
         if request.method == 'POST':
             rating = request.POST.get('stars', " ")
-            review = request.POST.get('review', " ")
+            # review = request.POST.get('review', " ")
 
-            click = ast.literal_eval(request.body.decode("utf-8"))
-            # print('________________________________________________________________________')
-            # print(click)
-            # print('________________________________________________________________________')
+            print('--------------------------------------------------------------------')
+            review = request.POST.get('review')
+            print(review)
+            # click = ast.literal_eval(request.body.decode("utf-8"))
+            click = request.body
+            my_click = click.decode('utf8').replace("'", '"')
+            # print(type(my_click))
+            # my_click = json.loads(my_click)
+            # my_click = json.dumps(my_click, indent=4, sort_keys=True)
+           
+            get_clicked = my_click[12:19]
 
-            # bookClick = click.get(clicked, 0)
-            
-            if (click['clicked'] == 'clicked'):
+            get_ISBN = my_click[29:39]
+
+
+            if (get_clicked == 'clicked'):
+                print("---------------------------get_clicked--------------------------------")
                 user_id = request.user.id + 278858
-                book_id = click['ISBN']
+                book_id = get_ISBN
 
                 new_clicks = 1
                 new_clicks_rating=get_clicks_rating(new_clicks)
@@ -153,16 +214,18 @@ def detail(request, isbn):
             if(rating == " "):
                 print("---------empty--------rating")
             else:
+                print("---------------------rating given-----------------------------------")
                 user_id = request.user.id + 278858
                 book_id = isbn
                 new_rating = rating
+                
                 x=mycol.find({"user_id":user_id,"activity.book_id":book_id},{"activity.$.activity":1,"_id":0})
                 if x.count()==0:
                     y=mycol.find({"user_id":user_id},{"activity.$.activity":1,"_id":0})
                     if(y.count()==0):
-                        mycol.insert({"user_id":user_id,"isFifteen":0,"activity":[{"book_id":book_id,"activity":{"rating":new_rating,"net_rating":new_rating,"date_modified":datetime.datetime.now()}}]})
+                        mycol.insert({"user_id":user_id,"isFifteen":0,"activity":[{"book_id":book_id,"activity":{"rating":int(new_rating),"net_rating":new_rating,"date_modified":datetime.datetime.now()}}]})
                     else:
-                        mycol.update({"user_id":user_id},{"$push":{"activity":{"book_id":book_id,"activity":{"rating":new_rating,"net_rating":new_rating,"date_modified":datetime.datetime.now()}}}})
+                        mycol.update({"user_id":user_id},{"$push":{"activity":{"book_id":book_id,"activity":{"rating":int(new_rating),"net_rating":new_rating,"date_modified":datetime.datetime.now()}}}})
                     
                 else:
                     data=x[0]['activity'][0]['activity']
@@ -181,11 +244,12 @@ def detail(request, isbn):
                     print("new rating is:"+str(new_rating))
                     print("net"+str(net_rating))
                     print("new date:"+str(datetime.datetime.now()))
-                    mycol.update({"user_id":user_id,"activity.book_id":book_id},{"$set":{"activity.$.activity.rating":new_rating,"activity.$.activity.net_rating":net_rating,"activity.$.activity.date_modified":datetime.datetime.now()} },upsert=True)
+                    mycol.update({"user_id":user_id,"activity.book_id":book_id},{"$set":{"activity.$.activity.rating":int(new_rating),"activity.$.activity.net_rating":net_rating,"activity.$.activity.date_modified":datetime.datetime.now()} },upsert=True)
 
             if(review == " "):
-                print("---------empty--------rating")
+                print("---------empty--------review")
             else:
+                print("--------------------------------review given----------------------------")
                 user_id= request.user.id + 278858
                 book_id= isbn
                 new_review = review
@@ -271,7 +335,6 @@ def detail(request, isbn):
     
     
 
-    
 
 
 
