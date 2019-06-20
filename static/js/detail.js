@@ -33,8 +33,10 @@
     // }), 10000);
 
     setTimeout(function(){ 
-      console.log(detail_url)
-      fetch("detail_url", {
+      // console.log(detail_url)
+       console.log("oh")
+      // console.log(type(detail_url))
+      fetch(`/example/detail/${isbn}`, {
         method: "POST", 
         credentials: "same-origin",
         headers: {
@@ -48,9 +50,10 @@
         console.log("Request complete! response:", res);
       })
 
-     }, 8000);
+     }, 4000);
     
 });
+
 
 
 
@@ -86,35 +89,35 @@ const ratings = {
     }
 
 
-    function sendReadIt(){
-      console.log(isbn);
-      fetch("detail_url", {
-        method: "POST", 
-        credentials: "same-origin",
-        headers: {
-            "X-CSRFToken": getCookie("csrftoken"),
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({readIt: 'read', clicked: 'clicked'})
-      }).then(res => {
-        console.log("Request complete! response:", res);
-      })
-    }
+    // function sendReadIt(){
+    //   console.log(isbn);
+    //   fetch("detail_url", {
+    //     method: "POST", 
+    //     credentials: "same-origin",
+    //     headers: {
+    //         "X-CSRFToken": getCookie("csrftoken"),
+    //         "Accept": "application/json",
+    //         "Content-Type": "application/json",
+    //         'X-Requested-With': 'XMLHttpRequest'
+    //     },
+    //     body: JSON.stringify({readIt: 'read', clicked: 'clicked'})
+    //   }).then(res => {
+    //     console.log("Request complete! response:", res);
+    //   })
+    // }
 
-    function getCookie(name) {
-      var cookieValue = null;
-      if (document.cookie && document.cookie != '') {
-          var cookies = document.cookie.split(';');
-          for (var i = 0; i < cookies.length; i++) {
-              var cookie = jQuery.trim(cookies[i]);
-              // Does this cookie string begin with the name we want?
-              if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                  break;
-              }
-          }
-      }
-      return cookieValue;
-    }
+    // function getCookie(name) {
+    //   var cookieValue = null;
+    //   if (document.cookie && document.cookie != '') {
+    //       var cookies = document.cookie.split(';');
+    //       for (var i = 0; i < cookies.length; i++) {
+    //           var cookie = jQuery.trim(cookies[i]);
+    //           // Does this cookie string begin with the name we want?
+    //           if (cookie.substring(0, name.length + 1) == (name + '=')) {
+    //               cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+    //               break;
+    //           }
+    //       }
+    //   }
+    //   return cookieValue;
+    // }
