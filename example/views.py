@@ -13,7 +13,6 @@ import pymongo
 import time
 import datetime
 
-import threading
 
 import ast
 
@@ -83,6 +82,7 @@ def index(request):
 
     if request.user.is_authenticated:
         userId = request.user.id + 278858
+        print('-------------------------------userId----------------------')
         print(userId)
         rec_books = get_recommendation(userId)
     else:
@@ -446,5 +446,4 @@ def getData(request):
 
 
     
-
 

@@ -7,6 +7,7 @@ from lightfm import LightFM
 # import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix 
 from scipy.sparse import coo_matrix 
+import scipy
 import time
 from datetime import datetime, timedelta
 from sklearn.metrics import roc_auc_score
@@ -15,10 +16,19 @@ import pickle
 import re
 import pymongo
 
+
 import json
 
 import time
-from datetime import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
+
+import datetime
+
+
+REFRESH_INTERVAL = 60 #seconds
+ 
+scheduler = BackgroundScheduler()
+scheduler.start()
 
 
 init = 'youtube'
@@ -27,6 +37,12 @@ myclient=pymongo.MongoClient('mongodb://localhost:27017/')
 mydb=myclient['majorProject']
 mycol=mydb['bookDataset']
 
+
+def get_recommendation(userId):
+    y = similar_recommendation(model_pickle, user_item_matrix_pickle, userId , user_dikt_pickle,threshold = 7)
+    z = json.dumps(y)
+    rec_books = json.loads(z)
+    return rec_books
 
 
 def similar_recommendation(model, interaction_matrix, user_id, user_dikt, 
@@ -85,18 +101,28 @@ def similar_recommendation(model, interaction_matrix, user_id, user_dikt,
     
     return y
 
+# name="name1"
 
-with open('model.pickle', 'rb') as handle:
-    model_pickle = pickle.load(handle)
 
-with open('item_dikt.pickle', 'rb') as handle:
-   item_dikt_pickle = pickle.load(handle)
+# new_name=get_new_name(name)
 
-with open('user_item_matrix.pickle', 'rb') as handle:
-    user_item_matrix_pickle = pickle.load(handle)
+# get_new_name(name)
+# {
+#     if(name="name1")
+#     {
+#         new_name="name2"
+#     }
+#     else
+#     {
+#         new_name="name1"
+#     }
+#     return new_name
 
-with open('user_dikt.pickle', 'rb') as handle:
-    user_dikt_pickle = pickle.load(handle)
+# }
+
+
+
+
 
 
 
@@ -126,9 +152,112 @@ def get_net_rating(review_rating,rating,clicks_rating):
     return net_rating
     # return 5
 
-
 def get_recommendation(userId):
+
+    with open('model.pickle', 'rb') as handle:
+        model_pickle = pickle.load(handle)
+
+    with open('item_dikt.pickle', 'rb') as handle:
+        item_dikt_pickle = pickle.load(handle)
+
+    with open('user_item_matrix.pickle', 'rb') as handle:
+        user_item_matrix_pickle = pickle.load(handle)
+
+    with open('user_dikt.pickle', 'rb') as handle:
+        user_dikt_pickle = pickle.load(handle)
+
     y = similar_recommendation(model_pickle, user_item_matrix_pickle, userId , user_dikt_pickle,threshold = 7)
     z = json.dumps(y)
     rec_books = json.loads(z)
     return rec_books
+
+
+# this returns list of user_id from interaction matrix (row name)
+# key is user_id value is matrix index
+def user_item_dikts(interaction_matrix):
+    user_ids = list(interaction_matrix.index)
+    user_dikt = {}
+    counter = 0 
+    for i in user_ids:
+        user_dikt[i] = counter
+        counter += 1
+    return user_dikt
+
+
+
+def talkShow():
+    print('---------------------------------------James Corden---------------------------------------------')
+    myClient=pymongo.MongoClient("localhost:27017")
+    mydb=myClient['majorProject']
+    mycol=mydb['userActivity']
+
+    # import interaction matrix file
+    with open('user_item_matrix.pickle', 'rb') as handle:
+        user_item_matrix_pickle = pickle.load(handle)
+
+
+    # for modifying date
+    x=mydb['date_modified'].find({},{"_id":0,"date_modified":1})
+    last_date_modified=list(x)[0]['date_modified']
+    # print(p)
+
+
+    # For isFifteen =1 users and newly modified activity only
+    x=mycol.aggregate([{"$match":{"activity.activity.date_modified":{"$lte":last_date_modified}}},{"$unwind":"$activity"},{"$match":{"isFifteen":1}},{"$match":{"activity.activity.date_modified":{"$gte":last_date_modified}}},{"$project":{"_id":0,"activity.activity.net_rating":1,"activity.activity.date_modified":1,"activity.book_id":1,"user_id":1}}])
+    data=list(x)
+    a=[]
+    for i in range(len(data)):
+        a.append({"user_id":data[i]['user_id'],"activity":data[i]['activity']['book_id'],"rating":data[i]['activity']['activity']['net_rating']})
+
+
+    # obtain activity of user (isFifteen= 0 and rating>15) on book
+    x=mydb['userActivity'].aggregate([{"$match":{"isFifteen":0}},{"$addFields":{"size":{"$size":"$activity"}}},{"$match":{"size":{"$gt":5}}},{"$project":{"user_id":1,"_id":0,"activity":{"book_id":1,"activity":{"net_rating":1}}}},{"$unwind":"$activity"},{"$project":{"user_id":1,"activity":"$activity.book_id","rating":"$activity.activity.net_rating"}}]);
+    interaction_data=list(x)
+    # obtain the list of new user to update (isFifteen =0 and rating>15)
+    y=mydb['userActivity'].aggregate([{"$match":{"isFifteen":0}},{"$addFields":{"size":{"$size":"$activity"}}},{"$match":{"size":{"$gt":5}}},{"$project":{"user_id":1,"_id":0}}]);
+    userlist=list(y)
+
+    # add both users
+    interaction_data=interaction_data+a
+
+
+    # For isFifteen=0 users
+    # this add new user to interaction matrix and initialize it to zero
+    for i in range (len(userlist)):
+        # this add new user to interaction matrix and initialize it to zero
+        user_item_matrix_pickle.loc[int(userlist[i]['user_id'])]=0
+       
+    #     this update isFifteen flag value
+        mycol.update({"user_id":userlist[i]['user_id']},{"$set":{"isFifteen":1 }})
+        
+
+    # updates all the new ratings
+    # this loops throught all the value interaction book and update the values with respective rating
+    for i in range(len(interaction_data)):
+        user_item_matrix_pickle[interaction_data[i]['activity']][int(interaction_data[i]['user_id'])] =round(2*float(interaction_data[i]['rating'])) 
+           
+    #for modifying date
+    mydb['date_modified'].update({},{"$set":{"date_modified":datetime.datetime.now()}})
+
+    # after interaction matrix is update, this convert pandas dataframe into scipy sparse matrix
+    user_item_matrix_sci = scipy.sparse.csr_matrix(user_item_matrix_pickle.values)
+
+
+    user_dikt = user_item_dikts(user_item_matrix_pickle)
+
+    model_pickle=LightFM(no_components=115,learning_rate=0.027,loss='warp')
+    model_pickle.fit(user_item_matrix_sci,epochs=12,num_threads=4)
+
+
+    with open('user_item_matrix.pickle', 'wb') as handle:
+        pickle.dump(user_item_matrix_pickle, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    with open('model.pickle', 'wb') as handle:
+        pickle.dump(model_pickle, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    with open('user_dikt.pickle', 'wb') as handle:
+        pickle.dump(user_dikt, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+talkShow()
+scheduler.add_job(talkShow, 'interval', seconds = REFRESH_INTERVAL)
+
