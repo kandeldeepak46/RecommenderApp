@@ -30,7 +30,7 @@ mycol=mydb['bookDataset']
 
 
 def similar_recommendation(model, interaction_matrix, user_id, user_dikt, 
-                               item_dikt,threshold = 0,number_rec_items = 15):
+                               threshold = 0,number_rec_items = 15):
     myclient=pymongo.MongoClient('mongodb://localhost:27017/')
     mydb=myclient['majorProject']
     mycol=mydb['bookDataset']
@@ -47,14 +47,16 @@ def similar_recommendation(model, interaction_matrix, user_id, user_dikt,
     # for i in range(len(interaction_data)):
     #     user_item_matrix_pickle[interaction_data[i]['activity']][int(userlist[i]['user_id'])] =int(interaction_data[i]['rating'])
 
+    print(user_id)
 
-
-    x=mycol.find({"user_id":user_id,"isFifteen":1})
+    x=mydb['userActivity'].find({"user_id":user_id,"isFifteen":1})
     isFifteen=x.count()
     print('------------------------------------------isFifteen---------------------------')
+    
     print(isFifteen)
 
-    try:
+
+    if (isFifteen == 1):
         print("-------------------15 books------------------------------")
         n_users, n_items = interaction_matrix.shape
         user_x = user_dikt[user_id]
@@ -65,17 +67,18 @@ def similar_recommendation(model, interaction_matrix, user_id, user_dikt,
         known_items = list(pd.Series(interaction_matrix.loc[user_id,:][interaction_matrix.loc[user_id,:] > threshold].index).sort_values(ascending=False))
 
         scores = [x for x in scores if x not in known_items]
-        print(len(scores))
+        # print(len(scores))
         score_list = scores[0:number_rec_items]
 
-        known_items = list(pd.Series(known_items).apply(lambda x: item_dikt[x]))
-        scores = list(pd.Series(score_list).apply(lambda x: item_dikt[x]))
+        # known_items = list(pd.Series(known_items).apply(lambda x: item_dikt[x]))
+        # scores = list(pd.Series(score_list).apply(lambda x: item_dikt[x]))
         scores1 = list(pd.Series(score_list))
 
         w=mycol.aggregate([{"$match":{"ISBN":{"$in":scores1}}},
                      {"$project":{'_id':0,'ISBN':'$ISBN', 'bookTitle':'$Book-Title','bookAuthor':'$Book-Author','genres':'$genres','imageURL':'$Image-URL','averageRating':'$average_rating','publicationYear':'$publication_year','description':'$description'} }])
         y=list(w)
-    except:
+    else:
+        print("--------------------------random-----------------------------------")
         w=mycol.aggregate([{"$match":{"average_rating":{"$gt":4}}},{"$sample":{"size":15}},
                           {"$project":{'_id':0,'ISBN':'$ISBN','bookTitle':'$Book-Title','bookAuthor':'$Book-Author','genres':'$genres','imageURL':'$Image-URL','averageRating':'$average_rating','publicationYear':'$publication_year','description':'$description'} }])
         y=list(w)
@@ -105,8 +108,6 @@ def get_review_rating(in_text):
     return 3
 
 def get_net_rating(review_rating,rating,clicks_rating):
-    print("------------------------------get_net_rating-------------------------------")
-    
     review_rating = float(review_rating)
     rating = float(rating)
     clicks_rating = float(clicks_rating)
@@ -127,7 +128,7 @@ def get_net_rating(review_rating,rating,clicks_rating):
 
 
 def get_recommendation(userId):
-    y = similar_recommendation(model_pickle, user_item_matrix_pickle, 125 , user_dikt_pickle, item_dikt_pickle,threshold = 7)
+    y = similar_recommendation(model_pickle, user_item_matrix_pickle, userId , user_dikt_pickle,threshold = 7)
     z = json.dumps(y)
     rec_books = json.loads(z)
     return rec_books

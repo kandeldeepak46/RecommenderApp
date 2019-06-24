@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 import json
+import requests
 from django.core import serializers
 from django.template.loader import render_to_string
 
@@ -34,6 +35,8 @@ rec_books = []
 top_rated_books = []
 
 
+
+
 # Create your views here.
 def index(request):
 
@@ -41,6 +44,22 @@ def index(request):
 
     global rec_books
     global top_rated_books
+
+    # global bookTitle
+    # global bookAuthor
+    # global genre
+    # global description
+    # global ISBN
+    # global imageURL
+    
+    # Initializing the getFormData as empty strings
+
+    bookTitle = 'bookTitle here'
+    bookAuthor = ''
+    genre = ''
+    description = ''
+    ISBN = ''
+    imageURL= ''
 
     # db=client.test_db
     # dict={'A':[1,2,3,4,5,6]}
@@ -55,42 +74,14 @@ def index(request):
     mycol = mydb["bookDataset"]
     x=mycol.aggregate([{"$match":{"average_rating":{"$gt":4}}},{"$sort":{"average_rating":-1}},{"$limit":50},{"$sample":{"size":15}},{"$project":{'_id':0, 'ISBN':'$ISBN', 'genres': '$genres', 'bookTitle': '$Book-Title', 'bookAuthor': '$Book-Author', 'publicationYear': '$Year-Of-Publication', 'publisher': '$Publisher', 'imageURL': '$Image-URL', 'averageRating': '$average_rating', 'description': '$description', 'publicationYear':'$publication_year'} }])
     top_rated_books=list(x)
-    print('top_rated_books')
-    print(type(top_rated_books))
-    for book in top_rated_books:
-        print('Yo')
-    # x=mycol.aggregate([{"$match":{"average_rating":{"$gt":4}}},{"$sort":{"average_rating":-1}},{"$limit":50},{"$sample":{"size":15}}])
-    # top_rated_books=list(x)
-    # top_rated =mycol.aggregate([{"$match":{"ISBN":{"$in":top_rated_books}}},
-    #                 {"$project":{'_id':0, 'ISBN':'$ISBN', 'genres': '$genres', 'bookTitle': '$Book-Title', 'bookAuthor': '$Book-Author', 'publicationYear': '$Year-Of-Publication', 'publisher': '$Publisher', 'imageURL': '$Image-URL', 'averageRating': '$average_rating', 'description': '$description'} }])
    
-    # print(list(top_rated))
-    
-    
-    
+
     
 
-    if request.method == 'POST':
-        bookImg = request.POST.get('Image-URL-L')
-        bookTitle = request.POST.get('Book-Title')
-        author = request.POST.get('Book-Author')
-        isbn = request.POST.get('ISBN')
-        genre = request.POST.get('genre')
-        description = request.POST.get('description')
-
-        # db=client.test_db
-        # dict={
-        #     'bookImg': bookImg,
-        #     'bookTitle': bookTitle,
-        #     'author': author,
-        #     'isbn': isbn,
-        #     'genre': genre,
-        #     'description': description
-        #     }
-        # db.test_collection.insert(dict)
 
     if request.user.is_authenticated:
         userId = request.user.id + 278858
+        print(userId)
         rec_books = get_recommendation(userId)
     else:
         rec_books = get_recommendation(0)
@@ -103,8 +94,6 @@ def index(request):
         #     'userId': userId
         #     }
         # db.new_user.insert(dict)
-    print("rec_books")
-    print(type(rec_books))
 
     if request.user.is_authenticated:
         if (request.user.profile.role == 'Shopkeeper'):
@@ -114,29 +103,119 @@ def index(request):
     else: 
         shopkeeper = 'no'
 
-    if request.method == 'POST': 
-        form = HotelForm(request.POST, request.FILES) 
-        print("-------------------------------FIles -----------------------------")
-        myfile = request.FILES['hotel_Main_Img']
-        fs = FileSystemStorage()
-        filename = fs.save(myfile.name, myfile)
-        uploaded_file_url = fs.url(filename)
-        print(uploaded_file_url)
-        if form.is_valid(): 
-            form.save() 
-            return redirect('index') 
-    else: 
-        form = HotelForm() 
-    return render(request, 'example/index.html', {
-        'form': form,
-        'rec_books': rec_books,
-        'top_rated': top_rated_books,
-        'shopkeeper': shopkeeper,      
-    }) 
-
-
     
-    return render(request, 'example/index.html', {'rec_books': rec_books, 'top_rated': top_rated_books, 'shopkeeper': shopkeeper})
+    # if request.method == 'POST' and request.FILES['book_cover']: 
+    #     form = BookCoverForm(request.POST, request.FILES) 
+    #     myfile = request.FILES['book_cover']
+    #     fs = FileSystemStorage()
+    #     filename = fs.save(myfile.name, myfile)
+    #     uploaded_file_url = fs.url(filename)
+    #     bookTitle = request.POST.get('Book-Title')
+    #     author = request.POST.get('Book-Author')
+    #     isbn = request.POST.get('ISBN')
+    #     genre = request.POST.get('genre')
+    #     description = request.POST.get('description') 
+    #     print(bookTitle, author, isbn, genre, description)
+    #     print(uploaded_file_url)
+        
+    #     myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+    #     mydb = myclient["majorProject"]
+    #     date_now=datetime.datetime.now()
+    #     mycol = mydb["bookDataset"]
+    #     x=mydb['counter'].find({},{"book_count":1,"_id":0})
+    #     new_book_id=list(x)[0]['book_count']+1
+    #     a={
+    #         'ISBN': isbn,
+    #         'Book-Title': bookTitle,
+    #         'Book-Author': author,
+    #         'Image-URL': uploaded_file_url,
+    #         'description': description,
+    #         'genres': genre,
+    #         'date_added':date_now
+    #     }
+    #     isRegister=True
+    #     try:
+    #         z=mycol.insert(a)
+    #         mydb['counter'].update({},{"$inc":{"book_count":1}})
+    #     except:
+    #         isRegister=False
+    #     print(isRegister)
+    #     print(new_book_id)
+
+    #     if form.is_valid():
+    #         form.save() 
+    #         return redirect('index') 
+    # else: 
+    #     form = BookCoverForm() 
+    # return render(request, 'example/index.html', {
+    #     'form': form,
+    #     'rec_books': rec_books,
+    #     'top_rated': top_rated_books,
+    #     'shopkeeper': shopkeeper,  
+    #     'getData' : {
+    #             'bookTitle': bookTitle,
+    #             'bookAuthor': bookAuthor,
+    #             'genre': genre,
+    #             'description': description,
+    #             'ISBN': ISBN,
+    #             'imageURL': imageURL 
+    #         }
+    # }) 
+
+
+    if request.method == 'POST':
+        # getData = request.GET.get('getData')
+        # send some data to nodeMCU signalling that it can send the barcode data (ISBN) to the django server
+        # do this if django server is able to get the ISBN
+        
+        # isbn_no = 0517703939 
+        # isbn_no = str(isbn_no)
+
+        isbn_no = '0886778271'
+
+        url = "https://www.googleapis.com/books/v1/volumes?q=" + isbn_no
+        response = requests.get(url)
+        parsed = json.loads(response.text)
+        if(parsed["totalItems"] == 0):
+            print("Couldn't find the book")
+        else:
+            bookTitle = parsed["items"][0]["volumeInfo"]["title"]
+            bookAuthor = parsed["items"][0]["volumeInfo"]["authors"]
+            bookAuthor = ", ".join(bookAuthor)
+            genre = parsed["items"][0]["volumeInfo"]["categories"]
+            genre = ", ".join(genre)
+            description = parsed["items"][0]["volumeInfo"]["description"]
+            imageURL = parsed["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
+            print(bookTitle)
+            
+            data = {
+                'bookTitle': bookTitle,
+                'bookAuthor': bookAuthor,
+                'genre': genre,
+                'description': description,
+                'imageURL': imageURL
+            }
+            
+            return JsonResponse(data)
+            
+    # print(bookTitle)
+    
+    return render(request, 'example/index.html', 
+        {
+            'rec_books': rec_books, 
+            'top_rated': top_rated_books, 
+            'shopkeeper': shopkeeper, 
+            'getData' : {
+                'bookTitle': bookTitle,
+                'bookAuthor': bookAuthor,
+                'genre': genre,
+                'description': description,
+                'ISBN': ISBN,
+                'imageURL': imageURL 
+            }
+
+        })
+
 
 
 def detail(request, isbn):
@@ -157,7 +236,6 @@ def detail(request, isbn):
             rating = request.POST.get('stars', " ")
             # review = request.POST.get('review', " ")
 
-            print('--------------------------------------------------------------------')
             review = request.POST.get('review')
             print(review)
             # click = ast.literal_eval(request.body.decode("utf-8"))
@@ -173,7 +251,7 @@ def detail(request, isbn):
 
 
             if (get_clicked == 'clicked'):
-                print("---------------------------get_clicked--------------------------------")
+
                 user_id = request.user.id + 278858
                 book_id = get_ISBN
 
@@ -183,13 +261,12 @@ def detail(request, isbn):
                 if x.count()==0:
                     y=mycol.find({"user_id":user_id},{"activity.$.activity":1,"_id":0})
                     if(y.count()==0):
-                        mycol.insert({"user_id":user_id,"is_fifteen":0,"activity":[{"book_id":book_id,"activity":{"clicks":new_clicks,"clicks_rating":new_clicks_rating,"net_rating":new_clicks_rating,"date_modified":datetime.datetime.now()}}]})
+                        mycol.insert({"user_id":user_id,"isFifteen":0,"activity":[{"book_id":book_id,"activity":{"clicks":new_clicks,"clicks_rating":new_clicks_rating,"net_rating":new_clicks_rating,"date_modified":datetime.datetime.now()}}]})
                     else:
                         mycol.update({"user_id":user_id},{"$push":{"activity":{"book_id":book_id,"activity":{"clicks":new_clicks,"clicks_rating":new_clicks_rating,"net_rating":new_clicks_rating,"date_modified":datetime.datetime.now()}}}})
                     
                 else:
                     data=x[0]['activity'][0]['activity']
-                    print(data)
                     try:
                         rating=float(data['rating'])
                     except:
@@ -206,15 +283,15 @@ def detail(request, isbn):
                     clicks_rating=get_clicks_rating(total_clicks)
                     net_rating=get_net_rating(review_rating,rating,clicks_rating)
                     
-                    print("net rating is :"+str(net_rating))
-                    print("new date:"+str(datetime.datetime.now()))
-                    print("clicks rating"+str(clicks_rating))
+                    # print("net rating is :"+str(net_rating))
+                    # print("new date:"+str(datetime.datetime.now()))
+                    # print("clicks rating"+str(clicks_rating))
                     mycol.update({"user_id":user_id,"activity.book_id":book_id},{"$set":{"activity.$.activity.clicks":total_clicks,"activity.$.activity.clicks_rating":clicks_rating,"activity.$.activity.net_rating":net_rating,"activity.$.activity.date_modified":datetime.datetime.now()} },upsert=True)
 
             if(rating == " "):
                 print("---------empty--------rating")
             else:
-                print("---------------------rating given-----------------------------------")
+                # print("---------------------rating given-----------------------------------")
                 user_id = request.user.id + 278858
                 book_id = isbn
                 new_rating = rating
@@ -239,17 +316,17 @@ def detail(request, isbn):
                     except:
                         review_rating=0
                     net_rating=get_net_rating(review_rating,new_rating,clicks_rating)
-                    print("clicks_rating is:"+str(clicks_rating))
-                    print("review rating is:"+str(review_rating))
-                    print("new rating is:"+str(new_rating))
-                    print("net"+str(net_rating))
-                    print("new date:"+str(datetime.datetime.now()))
+                    # print("clicks_rating is:"+str(clicks_rating))
+                    # print("review rating is:"+str(review_rating))
+                    # print("new rating is:"+str(new_rating))
+                    # print("net"+str(net_rating))
+                    # print("new date:"+str(datetime.datetime.now()))
                     mycol.update({"user_id":user_id,"activity.book_id":book_id},{"$set":{"activity.$.activity.rating":int(new_rating),"activity.$.activity.net_rating":net_rating,"activity.$.activity.date_modified":datetime.datetime.now()} },upsert=True)
 
             if(review == " "):
                 print("---------empty--------review")
             else:
-                print("--------------------------------review given----------------------------")
+                # print("--------------------------------review given----------------------------")
                 user_id= request.user.id + 278858
                 book_id= isbn
                 new_review = review
@@ -277,12 +354,12 @@ def detail(request, isbn):
                     
                     review_rating=get_review_rating(new_review)
                     net_rating=get_net_rating(review_rating,rating,clicks_rating)    
-                    print("review rating:"+str(review_rating))
-                    print("rating:"+str(rating))
-                    print("clicks rating:"+str(clicks_rating))
-                    print("net rating is :"+str(net_rating))
-                    print("new date:"+str(datetime.datetime.now()))
-                    print("net"+str(rating))
+                    # print("review rating:"+str(review_rating))
+                    # print("rating:"+str(rating))
+                    # print("clicks rating:"+str(clicks_rating))
+                    # print("net rating is :"+str(net_rating))
+                    # print("new date:"+str(datetime.datetime.now()))
+                    # print("net"+str(rating))
                     mycol.update({"user_id":user_id,"activity.book_id":book_id},{"$set":{"activity.$.activity.review":new_review,"activity.$.activity.review_rating":review_rating,"activity.$.activity.net_rating":net_rating,"activity.$.activity.date_modified":datetime.datetime.now()} },upsert=True)
 
             # readIt = ast.literal_eval(request.body.decode("utf-8"))
@@ -321,9 +398,9 @@ def detail(request, isbn):
     else: 
         shopkeeper = 'no'
 
+    hey = "yo"
     
-    
-    return render(request, 'example/detail.html', {'b': bookDetail, 'e': rec_books, 'shopkeeper': shopkeeper})
+    return render(request, 'example/detail.html', {'b': bookDetail, 'e': rec_books, 'hey': hey, 'shopkeeper': shopkeeper})
 
 
 
@@ -334,8 +411,36 @@ def detail(request, isbn):
 #         return render(request, 'example/index.html', )
     
     
+def getData(request):
+
+    # if 'getData' in request.POST:
+        # send some data to nodeMCU signalling that it can send the barcode data (ISBN) to the django server
+        # do this if django server is able to get the ISBN
+        # isbn_no = 1250178959
+        # isbn_no = str(isbn_no)
+
+        # url = "https://www.googleapis.com/books/v1/volumes?q=" + isbn_no
+        # response = requests.get(url)
+        # parsed = json.loads(response.text)
+        # if(parsed["totalItems"] == 0):
+        #     print("Couldn't find the book")
+        # else:
+        #     bookTitle = parsed["items"][0]["volumeInfo"]["title"]
+        #     bookAuthor = parsed["items"][0]["volumeInfo"]["authors"]
+        #     bookAuthor = ", ".join(bookAuthor)
+        #     genre = parsed["items"][0]["volumeInfo"]["categories"]
+        #     genre = ", ".join(genre)
+        #     description = parsed["items"][0]["volumeInfo"]["description"]
+        #     imageURL = parsed["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
+        #     print(bookTitle)
+
+    if request.method == 'POST':
+        print("Ed Sheeran - Castle On The Hill ")
 
 
+    return redirect('index')
 
 
     
+
+

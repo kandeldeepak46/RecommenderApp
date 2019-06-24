@@ -7,6 +7,7 @@
 
 <div class="top-content">
     <!-- <h2 style="padding:1.5rem;"> Recommended for you </h2> -->
+    
     <div class="container">
         <div id="carousel-example" class="carousel slide" data-ride="carousel">
             <div class="carousel-inner row w-100 mx-auto" role="listbox">
@@ -106,15 +107,16 @@
 
 </div>
 
+    <script>
+        let title = "{{getData.bookTitle}}";
+        console.log(title);
+    </script>
+
 
 
 {% endblock %}
 
-{% block extrajs %}
 
-    <script src="main.js"></script>
-
-{% endblock %}
 
 
 {% block addBook %}
@@ -134,47 +136,66 @@
             </div>
             <div class="modal-body">
 
-                <form enctype="multipart/form-data" action="{% url 'index' %}" method="POST" >
+                <form action="{% url 'index' %}" class="form" id="getForm" method="POST">
                     {% csrf_token %}
-                    {{ form}}
-                    <button type="submit">Upload</button>
+                    <input type="submit" value="Get Data" class="btn btn-primary" name ="getData">
                 </form>
-                <form action="{% url 'index' %}" method="POST" class="form" >
+               <hr/>
+                
+                <form enctype="multipart/form-data" action="{% url 'index' %}" method="POST" class="form" >
+                    {% csrf_token %}
                     
                     <div class="form-group">
-                        {% csrf_token %}
+                        <label for="bookImageUpload">Cover image</label>
+                        {{ form}}
+                    </div>
+
+                    <div class="form-group">
                         <label for="exampleFormControlInput1">Book Name</label>
-                        <input type="text" class="form-control" name="Book-Title" id="exampleFormControlInput1"
-                            placeholder="">
+                        <input type="text" class="form-control" name="Book-Title" id="bookTitle"
+                            placeholder="" required>
                             <label for="exampleFormControlInput1">Author</label>
-                        <input type="text" class="form-control" name="Book-Author" id="exampleFormControlInput1"
-                            placeholder="">
+                        <input type="text" class="form-control" name="Book-Author" id="bookAuthor"
+                            placeholder="" required>
                             <label for="exampleFormControlInput1">ISBN</label>
-                        <input type="text" class="form-control" name="ISBN" id="exampleFormControlInput1"
-                            placeholder="">
+                        <input type="text" class="form-control" name="ISBN" id="ISBN"
+                            placeholder="" required>
                     </div>
                     <div class="form-group">
                         <label for="exampleFormControlSelect1">Genre</label>
-                        <select class="form-control" name="genre" id="exampleFormControlSelect1">
+                        <select class="form-control" name="genre" id="genre">
+                            <option>Children</option>
+                            <option>Comics, Graphics</option>
+                            <option>Fantasy, Paranormal</option>
                             <option>Fiction</option>
-                            <option>Science Fiction</option>
-                            <option>Comedy</option>
-                            <option>Horror</option>
-                            <option>Non-fiction</option>
+                            <option>History, Historical Fiction, Biography</option>
+                            <option>Mystery, Thriller, Crime</option>
+                            <option>Non-Fiction</option>
+                            <option>Poetry</option>
+                            <option>Romance</option>
+                            <option>Young-Adult</option>
                         </select>
                     </div>
                    
                     <div class="form-group">
                         <label for="exampleFormControlTextarea1">Description</label>
-                        <textarea class="form-control" name="description" id="exampleFormControlTextarea1" rows="3"></textarea>
+                        <textarea class="form-control" name="description" id="description" rows="3" required></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary" name="submitData">Save changes</button>
                 </form>
                 
-            </div>
         </div>
         </div>
     </div>
     {% endif %}
+
+{% endblock %}
+
+
+{% block extrajs %}
+
+    <script src="main.js"></script>
+    <script src="getData.js"></script>
+
 {% endblock %}
