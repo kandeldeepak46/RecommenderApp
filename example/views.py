@@ -13,6 +13,8 @@ import pymongo
 import time
 import datetime
 
+import threading
+
 import ast
 
 from mysite import get_recommendation, get_clicks_rating, get_review_rating, get_net_rating, myclient, mydb, mycol
@@ -197,6 +199,8 @@ def index(request):
             }
             
             return JsonResponse(data)
+
+    
             
     # print(bookTitle)
     
