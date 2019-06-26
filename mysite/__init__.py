@@ -202,22 +202,23 @@ def talkShow():
     # for modifying date
     x=mydb['date_modified'].find({},{"_id":0,"date_modified":1})
     last_date_modified=list(x)[0]['date_modified']
-    # print(p)
+    print("the date modified is:",last_date_modified)
 
 
     # This adds new books at the end of interaction matrix 
     # The last_date_modified needs to be updated here. Right now, the date is harcoded
-    # x=mydb['bookDataset'].aggregate([{"$match":{"date_added":{"$gt":datetime.datetime(2019, 6, 21, 8, 25,50)}}},{"$project":{"_id":0,"ISBN":1}}])
-    # data=list(x)
-    # print(data)
-    # for i in data:
-    #     user_item_matrix_pickle[i['ISBN']]=0
-
+    x=mydb['bookDataset'].aggregate([{"$match":{"date_added":{"$gt":last_date_modified}}},{"$project":{"_id":0,"ISBN":1}}])
+    data=list(x)
+    print("the following newly added books are: added")
+    for i in data:
+        print(i['ISBN'])
+        user_item_matrix_pickle[i['ISBN']]=0
 
     # For isFifteen =1 users and newly modified activity only
-    x=mycol.aggregate([{"$match":{"activity.activity.date_modified":{"$lte":last_date_modified}}},{"$unwind":"$activity"},{"$match":{"isFifteen":1}},{"$match":{"activity.activity.date_modified":{"$gte":last_date_modified}}},{"$project":{"_id":0,"activity.activity.net_rating":1,"activity.activity.date_modified":1,"activity.book_id":1,"user_id":1}}])
+    x=mycol.aggregate([{"$match":{"activity.activity.date_modified":{"$gte":last_date_modified}}},{"$unwind":"$activity"},{"$match":{"isFifteen":1}},{"$match":{"activity.activity.date_modified":{"$gte":last_date_modified}}},{"$project":{"_id":0,"activity.activity.net_rating":1,"activity.activity.date_modified":1,"activity.book_id":1,"user_id":1}}])
     data=list(x)
     a=[]
+    print("new activity are update now")
     for i in range(len(data)):
         a.append({"user_id":data[i]['user_id'],"activity":data[i]['activity']['book_id'],"rating":data[i]['activity']['activity']['net_rating']})
 
@@ -235,9 +236,11 @@ def talkShow():
 
     # For isFifteen=0 users
     # this add new user to interaction matrix and initialize it to zero
+    print("newly added useers are:")
     for i in range (len(userlist)):
         # this add new user to interaction matrix and initialize it to zero
         user_item_matrix_pickle.loc[int(userlist[i]['user_id'])]=0
+        print(userlist[i]['user_id'])
        
     #     this update isFifteen flag value
         mycol.update({"user_id":userlist[i]['user_id']},{"$set":{"isFifteen":1 }})
@@ -245,7 +248,10 @@ def talkShow():
 
     # updates all the new ratings
     # this loops throught all the value interaction book and update the values with respective rating
+    print("interaction matrix are update now")
+    print(interaction_data)
     for i in range(len(interaction_data)):
+        print("book no",i)
         user_item_matrix_pickle[interaction_data[i]['activity']][int(interaction_data[i]['user_id'])] =round(2*float(interaction_data[i]['rating'])) 
            
     #for modifying date
@@ -259,16 +265,18 @@ def talkShow():
 
     model_pickle=LightFM(no_components=115,learning_rate=0.027,loss='warp')
     model_pickle.fit(user_item_matrix_sci,epochs=12,num_threads=4)
-
+    print("new data train here")
 
     with open('user_item_matrix.pickle', 'wb') as handle:
         pickle.dump(user_item_matrix_pickle, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
+        print("user_item_matrix is saved here")
     with open('model.pickle', 'wb') as handle:
         pickle.dump(model_pickle, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        print("model is saved here")
 
     with open('user_dikt.pickle', 'wb') as handle:
         pickle.dump(user_dikt, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        print("user dictionary is saved here")
 
 talkShow()
 scheduler.add_job(talkShow, 'interval', seconds = REFRESH_INTERVAL)

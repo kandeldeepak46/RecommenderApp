@@ -174,40 +174,40 @@ def index(request):
     }) 
 
 
-    if request.method == 'POST':
-        # getData = request.GET.get('getData')
-        # send some data to nodeMCU signalling that it can send the barcode data (ISBN) to the django server
-        # do this if django server is able to get the ISBN
+    # if request.method == 'POST':
+    #     # getData = request.GET.get('getData')
+    #     # send some data to nodeMCU signalling that it can send the barcode data (ISBN) to the django server
+    #     # do this if django server is able to get the ISBN
         
-        # isbn_no = 0517703939 
-        # isbn_no = str(isbn_no)
+    #     # isbn_no = 0517703939 
+    #     # isbn_no = str(isbn_no)
 
-        isbn_no = '0886778271'
+    #     isbn_no = '0886778271'
 
-        url = "https://www.googleapis.com/books/v1/volumes?q=" + isbn_no
-        response = requests.get(url)
-        parsed = json.loads(response.text)
-        if(parsed["totalItems"] == 0):
-            print("Couldn't find the book")
-        else:
-            bookTitle = parsed["items"][0]["volumeInfo"]["title"]
-            bookAuthor = parsed["items"][0]["volumeInfo"]["authors"]
-            bookAuthor = ", ".join(bookAuthor)
-            genre = parsed["items"][0]["volumeInfo"]["categories"]
-            genre = ", ".join(genre)
-            description = parsed["items"][0]["volumeInfo"]["description"]
-            imageURL = parsed["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
-            print(bookTitle)
+    #     url = "https://www.googleapis.com/books/v1/volumes?q=" + isbn_no
+    #     response = requests.get(url)
+    #     parsed = json.loads(response.text)
+    #     if(parsed["totalItems"] == 0):
+    #         print("Couldn't find the book")
+    #     else:
+    #         bookTitle = parsed["items"][0]["volumeInfo"]["title"]
+    #         bookAuthor = parsed["items"][0]["volumeInfo"]["authors"]
+    #         bookAuthor = ", ".join(bookAuthor)
+    #         genre = parsed["items"][0]["volumeInfo"]["categories"]
+    #         genre = ", ".join(genre)
+    #         description = parsed["items"][0]["volumeInfo"]["description"]
+    #         imageURL = parsed["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
+    #         print(bookTitle)
             
-            data = {
-                'bookTitle': bookTitle,
-                'bookAuthor': bookAuthor,
-                'genre': genre,
-                'description': description,
-                'imageURL': imageURL
-            }
+    #         data = {
+    #             'bookTitle': bookTitle,
+    #             'bookAuthor': bookAuthor,
+    #             'genre': genre,
+    #             'description': description,
+    #             'imageURL': imageURL
+    #         }
             
-            return JsonResponse(data)
+    #         return JsonResponse(data)
 
     
             
@@ -284,21 +284,17 @@ def detail(request, isbn):
 
     if request.user.is_authenticated:
         if request.method == 'POST':
-            rating = request.POST.get('stars', " ")
-            # review = request.POST.get('review', " ")
-
-            review = request.POST.get('review')
-            print(review)
-            # click = ast.literal_eval(request.body.decode("utf-8"))
+         
             click = request.body
-            my_click = click.decode('utf8').replace("'", '"')
-            # print(type(my_click))
-            # my_click = json.loads(my_click)
-            # my_click = json.dumps(my_click, indent=4, sort_keys=True)
-           
-            get_clicked = my_click[12:19]
 
-            get_ISBN = my_click[29:39]
+            if(type(click)!=bytes):
+                my_click = json.loads(click.decode('utf-8'))
+                get_clicked=my_click['clicked']
+                get_ISBN = my_click['ISBN']
+            else:
+                get_clicked="notclicked"
+                rating = request.POST.get('stars', " ")
+                review = request.POST.get('review')
 
 
             if (get_clicked == 'clicked'):
