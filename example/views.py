@@ -34,8 +34,8 @@ bookDetail = ''
 
 rec_books = []
 top_rated_books = []
-
-
+book_search_data = []
+recently_added = []
 
 
 # Create your views here.
@@ -45,6 +45,7 @@ def index(request):
 
     global rec_books
     global top_rated_books
+    global recently_added
 
     # global bookTitle
     # global bookAuthor
@@ -75,18 +76,24 @@ def index(request):
     mycol = mydb["bookDataset"]
     x=mycol.aggregate([{"$match":{"average_rating":{"$gt":4}}},{"$sort":{"average_rating":-1}},{"$limit":50},{"$sample":{"size":15}},{"$project":{'_id':0, 'ISBN':'$ISBN', 'genres': '$genres', 'bookTitle': '$Book-Title', 'bookAuthor': '$Book-Author', 'publicationYear': '$Year-Of-Publication', 'publisher': '$Publisher', 'imageURL': '$Image-URL', 'averageRating': '$average_rating', 'description': '$description', 'publicationYear':'$publication_year'} }])
     top_rated_books=list(x)
-   
 
-    
+
+    # for recently added
+    # limit size is changeable. Right now, it's set to 3
+    y=mydb['bookDataset'].aggregate([{"$sort":{"date_added":-1}},{"$limit":5},{"$sample":{"size":15}},{"$project":{'_id':0, 'ISBN':'$ISBN', 'genres': '$genres', 'bookTitle': '$Book-Title', 'bookAuthor': '$Book-Author', 'publicationYear': '$Year-Of-Publication', 'publisher': '$Publisher', 'imageURL': '$Image-URL', 'averageRating': '$average_rating', 'description': '$description', 'publicationYear':'$publication_year'} }])
+    recently_added = list(y)
+    # print(recently_added)
+   
 
 
     if request.user.is_authenticated:
         userId = request.user.id + 278858
         print('-------------------------------userId----------------------')
         print(userId)
-        rec_books = get_recommendation(userId)
+        rec_books, heading = get_recommendation(userId)
+
     else:
-        rec_books = get_recommendation(0)
+        rec_books, heading = get_recommendation(0)
 
 
         # Profile.objects.filter(user=request.user).update(fifteenBooks=True)
@@ -106,63 +113,65 @@ def index(request):
         shopkeeper = 'no'
 
     
-    # if request.method == 'POST' and request.FILES['book_cover']: 
-    #     form = BookCoverForm(request.POST, request.FILES) 
-    #     myfile = request.FILES['book_cover']
-    #     fs = FileSystemStorage()
-    #     filename = fs.save(myfile.name, myfile)
-    #     uploaded_file_url = fs.url(filename)
-    #     bookTitle = request.POST.get('Book-Title')
-    #     author = request.POST.get('Book-Author')
-    #     isbn = request.POST.get('ISBN')
-    #     genre = request.POST.get('genre')
-    #     description = request.POST.get('description') 
-    #     print(bookTitle, author, isbn, genre, description)
-    #     print(uploaded_file_url)
+    if request.method == 'POST' and request.FILES['book_cover']: 
+        form = BookCoverForm(request.POST, request.FILES) 
+        myfile = request.FILES['book_cover']
+        fs = FileSystemStorage()
+        filename = fs.save(myfile.name, myfile)
+        uploaded_file_url = fs.url(filename)
+        bookTitle = request.POST.get('Book-Title')
+        author = request.POST.get('Book-Author')
+        isbn = request.POST.get('ISBN')
+        genre = request.POST.get('genre')
+        description = request.POST.get('description') 
+        print(bookTitle, author, isbn, genre, description)
+        print(uploaded_file_url)
         
-    #     myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-    #     mydb = myclient["majorProject"]
-    #     date_now=datetime.datetime.now()
-    #     mycol = mydb["bookDataset"]
-    #     x=mydb['counter'].find({},{"book_count":1,"_id":0})
-    #     new_book_id=list(x)[0]['book_count']+1
-    #     a={
-    #         'ISBN': isbn,
-    #         'Book-Title': bookTitle,
-    #         'Book-Author': author,
-    #         'Image-URL': uploaded_file_url,
-    #         'description': description,
-    #         'genres': genre,
-    #         'date_added':date_now
-    #     }
-    #     isRegister=True
-    #     try:
-    #         z=mycol.insert(a)
-    #         mydb['counter'].update({},{"$inc":{"book_count":1}})
-    #     except:
-    #         isRegister=False
-    #     print(isRegister)
-    #     print(new_book_id)
+        myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+        mydb = myclient["majorProject"]
+        date_now=datetime.datetime.now()
+        mycol = mydb["bookDataset"]
+        x=mydb['counter'].find({},{"book_count":1,"_id":0})
+        new_book_id=list(x)[0]['book_count']+1
+        a={
+            'ISBN': isbn,
+            'Book-Title': bookTitle,
+            'Book-Author': author,
+            'Image-URL': uploaded_file_url,
+            'description': description,
+            'genres': genre,
+            'date_added':date_now
+        }
+        isRegister=True
+        try:
+            z=mycol.insert(a)
+            mydb['counter'].update({},{"$inc":{"book_count":1}})
+        except:
+            isRegister=False
+        print(isRegister)
+        print(new_book_id)
 
-    #     if form.is_valid():
-    #         form.save() 
-    #         return redirect('index') 
-    # else: 
-    #     form = BookCoverForm() 
-    # return render(request, 'example/index.html', {
-    #     'form': form,
-    #     'rec_books': rec_books,
-    #     'top_rated': top_rated_books,
-    #     'shopkeeper': shopkeeper,  
-    #     'getData' : {
-    #             'bookTitle': bookTitle,
-    #             'bookAuthor': bookAuthor,
-    #             'genre': genre,
-    #             'description': description,
-    #             'ISBN': ISBN,
-    #             'imageURL': imageURL 
-    #         }
-    # }) 
+        if form.is_valid():
+            form.save() 
+            return redirect('index') 
+    else: 
+        form = BookCoverForm() 
+    return render(request, 'example/index.html', {
+        'form': form,
+        'rec_books': rec_books,
+        'recently_added': recently_added,
+        'heading': heading,
+        'top_rated': top_rated_books,
+        'shopkeeper': shopkeeper,  
+        'getData' : {
+                'bookTitle': bookTitle,
+                'bookAuthor': bookAuthor,
+                'genre': genre,
+                'description': description,
+                'ISBN': ISBN,
+                'imageURL': imageURL 
+            }
+    }) 
 
 
     if request.method == 'POST':
@@ -207,7 +216,9 @@ def index(request):
     return render(request, 'example/index.html', 
         {
             'rec_books': rec_books, 
+            'heading': heading,
             'top_rated': top_rated_books, 
+            'recently_added': recently_added,
             'shopkeeper': shopkeeper, 
             'getData' : {
                 'bookTitle': bookTitle,
@@ -231,9 +242,45 @@ def detail(request, isbn):
     global export
     global bookDetail
 
-    for book in rec_books:
-        if book['ISBN'] == isbn:
-            bookDetail = book
+    whichList = 0
+
+    if whichList == 0:
+        for book in rec_books:
+            if book['ISBN'] == isbn:
+                bookDetail = book
+                whichList = 1
+            else: 
+                whichList = 0
+
+    if whichList != 1:
+        for book in top_rated_books:
+            if book['ISBN'] == isbn:
+                bookDetail = book
+                whichList = 2
+            else: 
+                whichList = 0
+
+    if whichList != 2:
+        for book in book_search_data:
+            if book['ISBN'] == isbn:
+                bookDetail = book
+                whichList = 3
+            else:
+                whichList = 0
+    
+    if whichList != 3:
+        for book in recently_added:
+            if book['ISBN'] == isbn:
+                bookDetail = book
+                print('-------------recently Added-----------------------')
+                whichList = 4
+            else:
+                whichList = 0
+
+    # if 'mainPage' in request.GET:
+    #     for book in rec_books:
+    #         if book['ISBN'] == isbn:
+    #             bookDetail = book
 
     if request.user.is_authenticated:
         if request.method == 'POST':
@@ -446,4 +493,20 @@ def getData(request):
 
 
     
+def search(request):
+
+    global book_search_data
+
+    if 'search' in request.GET:
+        print('------------------------searched--------------------------------')
+        searchString = request.GET.get('search')
+
+        book_search_variable= searchString
+        w=mydb['bookDataset'].aggregate([{"$match":{"Book-Title":{"$regex":book_search_variable}}},
+                    {"$project":{'_id':0,'ISBN':'$ISBN', 'bookTitle':'$Book-Title','bookAuthor':'$Book-Author','genres':'$genres','imageURL':'$Image-URL','averageRating':'$average_rating','publicationYear':'$publication_year','description':'$description'} },{"$limit":15}])
+        book_search_data = list(w) 
+        print(book_search_data)       
+
+    return render(request, 'example/search.html', {'searchResult': book_search_data})
+
 

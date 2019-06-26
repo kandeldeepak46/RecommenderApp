@@ -39,10 +39,10 @@ mycol=mydb['bookDataset']
 
 
 def get_recommendation(userId):
-    y = similar_recommendation(model_pickle, user_item_matrix_pickle, userId , user_dikt_pickle,threshold = 7)
+    y, heading = similar_recommendation(model_pickle, user_item_matrix_pickle, userId , user_dikt_pickle,threshold = 7)
     z = json.dumps(y)
     rec_books = json.loads(z)
-    return rec_books
+    return rec_books, heading
 
 
 def similar_recommendation(model, interaction_matrix, user_id, user_dikt, 
@@ -93,13 +93,16 @@ def similar_recommendation(model, interaction_matrix, user_id, user_dikt,
         w=mycol.aggregate([{"$match":{"ISBN":{"$in":scores1}}},
                      {"$project":{'_id':0,'ISBN':'$ISBN', 'bookTitle':'$Book-Title','bookAuthor':'$Book-Author','genres':'$genres','imageURL':'$Image-URL','averageRating':'$average_rating','publicationYear':'$publication_year','description':'$description'} }])
         y=list(w)
+        heading = "Recommended books"
+
     else:
         print("--------------------------random-----------------------------------")
         w=mycol.aggregate([{"$match":{"average_rating":{"$gt":4}}},{"$sample":{"size":15}},
                           {"$project":{'_id':0,'ISBN':'$ISBN','bookTitle':'$Book-Title','bookAuthor':'$Book-Author','genres':'$genres','imageURL':'$Image-URL','averageRating':'$average_rating','publicationYear':'$publication_year','description':'$description'} }])
         y=list(w)
-    
-    return y
+        heading = "Random books"
+
+    return y, heading
 
 # name="name1"
 
@@ -200,6 +203,15 @@ def talkShow():
     x=mydb['date_modified'].find({},{"_id":0,"date_modified":1})
     last_date_modified=list(x)[0]['date_modified']
     # print(p)
+
+
+    # This adds new books at the end of interaction matrix 
+    # The last_date_modified needs to be updated here. Right now, the date is harcoded
+    # x=mydb['bookDataset'].aggregate([{"$match":{"date_added":{"$gt":datetime.datetime(2019, 6, 21, 8, 25,50)}}},{"$project":{"_id":0,"ISBN":1}}])
+    # data=list(x)
+    # print(data)
+    # for i in data:
+    #     user_item_matrix_pickle[i['ISBN']]=0
 
 
     # For isFifteen =1 users and newly modified activity only
