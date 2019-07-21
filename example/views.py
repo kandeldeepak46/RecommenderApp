@@ -80,7 +80,7 @@ def index(request):
 
     # for recently added
     # limit size is changeable. Right now, it's set to 3
-    y=mydb['bookDataset'].aggregate([{"$sort":{"date_added":-1}},{"$limit":5},{"$sample":{"size":15}},{"$project":{'_id':0, 'ISBN':'$ISBN', 'genres': '$genres', 'bookTitle': '$Book-Title', 'bookAuthor': '$Book-Author', 'publicationYear': '$Year-Of-Publication', 'publisher': '$Publisher', 'imageURL': '$Image-URL', 'averageRating': '$average_rating', 'description': '$description', 'publicationYear':'$publication_year'} }])
+    y=mydb['bookDataset'].aggregate([{"$sort":{"date_added":-1}},{"$limit":10},{"$sample":{"size":15}},{"$project":{'_id':0, 'ISBN':'$ISBN', 'genres': '$genres', 'bookTitle': '$Book-Title', 'bookAuthor': '$Book-Author', 'publicationYear': '$Year-Of-Publication', 'publisher': '$Publisher', 'imageURL': '$Image-URL', 'averageRating': '$average_rating', 'description': '$description', 'publicationYear':'$publication_year'} }])
     recently_added = list(y)
     # print(recently_added)
    
