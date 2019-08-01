@@ -32,7 +32,10 @@
                         <div class="card" style="width: 15rem;">
                             <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
                                 style="width:200; height:300;">
-                            <div class="card-body">
+                            <div class="card-body
+
+                            [M]iddleware that hits request.POST should (usually) be considered a bug. It means that the view will be unable to set any custom upload handlers, perform custom parsing of the request body, or enforce permission checks prior to file uploads being accepted.
+                        ">
                                 <h5 class="card-title">{{books.bookTitle}}</h5>
                                 <p class="card-text">By {{books.bookAuthor}}</p>
                                 <a href= "{% url 'detail' books.ISBN %} "> More </a>
@@ -155,7 +158,7 @@
             </a>
         </div>
     </div>
-
+ 
 </div>
 
     <script>
@@ -187,17 +190,24 @@
             </div>
             <div class="modal-body">
 
-                <form action="{% url 'index' %}" class="form" id="getForm" method="POST">
+                <div>
+
+                </div>
+                <form action="getData" class="form" id="getForm" method="POST">
                     {% csrf_token %}
-                    <input type="submit" value="Get Data" class="btn btn-primary" name ="getData" disabled>
+                    <input type="submit" value="Get Data" class="btn btn-primary" name ="getData" >
+                    <div  style="float: right;color:blue;">
+                        <span id='request_message'>
+                            
+                        </span> </div>
                 </form>
                <hr/>
                 
-                <form enctype="multipart/form-data" action="{% url 'index' %}" method="POST" class="form" >
+                <form enctype="multipart/form-data" action="{% url 'index' %}add_book" method="POST" class="form" >
                     {% csrf_token %}
                     
                     <div class="form-group">
-                        <label for="bookImageUpload">Cover image</label>
+                        <img  id="book_image_src" alt="bookSelect" width="110" height="150"> 
                         {{ form}}
                     </div>
 

@@ -278,6 +278,6 @@ def talkShow():
         pickle.dump(user_dikt, handle, protocol=pickle.HIGHEST_PROTOCOL)
         print("user dictionary is saved here")
 
-talkShow()
-scheduler.add_job(talkShow, 'interval', seconds = REFRESH_INTERVAL)
+# talkShow()
+# scheduler.add_job(talkShow, 'interval', seconds = REFRESH_INTERVAL)
 

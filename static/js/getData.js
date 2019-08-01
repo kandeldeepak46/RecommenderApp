@@ -27,28 +27,53 @@ $(document).ready(function() {
 
    $('#getForm').on('submit', function(event){
     event.preventDefault();
-    console.log("form submitted!")  // sanity check
+    // console.log("undercover agent");
+    // str=$("#id_book_cover").val;
+    var str="http";
+    if(str.match(/http/gi).length>0)
+    {
+        $("#id_book_cover").prop('required',false);
+    }
+    else
+    {
+        $("#id_book_cover").prop('required',true);
+    }
     getData();
     });
 
+  
+    $('#id_book_cover').change(function(){
+        // $('#book_image_src').attr("src",this.files[0].mozFullPath);  
+        // alert($(this).val());
+        var reader = new FileReader();
 
+            reader.onload = function (e) {
+                $('#book_image_src')
+                    .attr('src', e.target.result)                    
+            };
+            reader.readAsDataURL(this.files[0]);
+        alert(this.files[0].size);
+    });
 
     function getData() {
-        console.log("create post is working!: sanity check here") // sanity check
-
+        // console.log("create post is working!: sanity check here hello guyz") // sanity check
+        console.log('we are here')
         $.ajax({
-            url : '/example/', // the endpoint
+            url : '/example/getData', // the endpoint
             type : "POST", // http method
             // handle a successful response
             success: function(response) { // on success..
                 console.log("after pressing the button");
                 console.log(response.bookTitle);
-                
                 $("#bookTitle").val(response.bookTitle);
                 $("#bookAuthor").val(response.bookAuthor);
                 $("#ISBN").val(response.ISBN);
                 $("#description").val(response.description);
-                $('#genre').val(response.genre)
+                $('#genre').val(response.genre);
+                $('#imageURL').val(response.imageURL);
+                $('#book_image_src').attr("src",response.imageURL);                     
+                // $('#book_image_src').attr("src","https://upload.wikimedia.org/wikipedia/en/d/dc/A_Song_of_Ice_and_Fire_book_collection_box_set_cover.jpg");
+                $('#request_message').text(response.request_message);
                 // $('#sth').html(response); // update the DIV 
             },
             // success : function(json) {
@@ -69,5 +94,4 @@ $(document).ready(function() {
             }
         });
     };
-
  });

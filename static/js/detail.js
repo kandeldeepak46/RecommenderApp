@@ -50,8 +50,7 @@
         console.log("Request complete! response:", res);
       })
 
-     }, 4000);
-    
+     }, 4000);    
 });
 
 
