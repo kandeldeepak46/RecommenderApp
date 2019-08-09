@@ -12,13 +12,23 @@ ROLE_CHOICES= [
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
 
+    def __init__(self, *args, **kwargs):
+        super(UserRegisterForm, self).__init__(*args, **kwargs)
+
+        for fieldname in ['username', 'password1', 'password2']:
+            self.fields[fieldname].help_text = None
+
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
+    
+
 
 class ProfileForm(forms.ModelForm):
-    role = forms.CharField(label='Do you want to sign in as customer or shopkeeper?', widget=forms.Select(choices=ROLE_CHOICES))
+    role = forms.CharField(label='Role', widget=forms.Select(choices=ROLE_CHOICES))
     
     class Meta:
         model = Profile
         fields = ['role']
+
+        

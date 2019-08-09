@@ -1,8 +1,8 @@
-
 {% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
     <!-- Required meta tags -->
@@ -14,7 +14,7 @@
 
     <!-- Font Awesome -->
     <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous"> -->
-    
+
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'fontawesome/css/fontawesome-all.min.css' %}">
 
@@ -27,69 +27,73 @@
     <title>Example</title>
 
 </head>
+
 <body>
     <!-- {{e.0.bookTitle}} -->
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#" style="margin-left: 4em; margin-right:1.5em;">BookRec</a>
+    <nav class="navbar navbar-expand-lg navbar-default" style="background-color: orange;">
+        <a class="navbar-brand" href="#"
+            style="margin-left: 4em; margin-right:1.5em; color: black; font-weight: bold; font-size: 1.8em">BookRec</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-    
+
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" style="color: black;" href="#">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
+                    <a class="nav-link" style="color: black;" href="#">About</a>
                 </li>
             </ul>
-                <form class="form-inline my-2 my-lg-0" action="{% url 'search' %}" method="GET">
-                    {% csrf_token %}
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search" required>
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                    <!-- <a href= "{% url 'search' %} ">Search</a> -->
-                </form>
+            <form class="form-inline my-2 my-lg-0" action="{% url 'search' %}" method="GET">
+                {% csrf_token %}
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search"
+                    required>
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                <!-- <a href= "{% url 'search' %} ">Search</a> -->
+            </form>
+
             <ul class="navbar-nav ml-auto" style="margin-right:4em;">
                 {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <h4 style="font-style:italic; padding-top:0.5rem; padding-right:1.3em;">Hi {{request.user.username}}</h4>
+                    <h4 style="color: black;font-style:italic; padding-top:0.5rem; padding-right:1.3em;">Hi
+                        {{request.user.username}}
+                    </h4>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout'%} ">Logout</a>
+                    <a class="nav-link" style="color:black;" href="{% url 'logout'%} ">Logout</a>
                 </li>
                 {% block addBook %}
 
                 {% endblock %}
-                
-                
 
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login'%} ">Login</a>
+                    <a class="nav-link" style="color:black;" href="{% url 'login'%} ">Login</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    <a class="nav-link" style="color:black;" href="{% url 'register' %}">Register</a>
                 </li>
                 {% endif %}
             </ul>
-            
-            
+
+
         </div>
     </nav>
 
     {% ifequal request.user.dropdown 'Shopkeeper' %}
-        <h1> You are shopkeeper </h1>
+    <h1> You are shopkeeper </h1>
     {% endifequal %}
 
     {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
     {% endif %}
 
     {% block body %}
@@ -112,19 +116,11 @@
 
     <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/detail.js' %}"></script>
-    <script src="{% static 'js/reviewForm.js' %}" ></script>
-    <script src="{% static 'js/ratingForm.js' %}" ></script>
-    <script src="{% static 'js/getData.js' %}" ></script>
+    <script src="{% static 'js/reviewForm.js' %}"></script>
+    <script src="{% static 'js/ratingForm.js' %}"></script>
+    <script src="{% static 'js/getData.js' %}"></script>
 
 </body>
 
 
 </html>
-
-
-
-
-
-
-
-
