@@ -25,6 +25,12 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import datetime
 
 
+import torch
+import pickle
+import torchtext
+import spacy
+
+
 REFRESH_INTERVAL = 60 #seconds
  
 scheduler = BackgroundScheduler()
@@ -127,14 +133,54 @@ def similar_recommendation(model, interaction_matrix, user_id, user_dikt,
 
 
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+import torch.nn as nn
 
+model= torch.load("sentiment_model.pt",map_location='cpu')
 
+with open('t_vocab.pickle', 'rb') as handle:
+    text_vocab = pickle.load(handle)
+
+import spacy
+nlp = spacy.load('en')
+
+def predict_sentiment(model, sentence):
+    print("function call")
+    sentence = sentence.lower()
+    tokenized = [tok.text for tok in nlp.tokenizer(sentence)]
+    print("type 1 is",type(tokenized))
+    indexed = [text_vocab[t] for t in tokenized]
+    print("type 2 is",type(indexed))
+    length = [len(indexed)]
+    tensor = torch.LongTensor(indexed).to(device)
+    tensor = tensor.unsqueeze(1)
+    length_tensor = torch.LongTensor(length)
+    prediction = torch.sigmoid(model(tensor, length_tensor))
+    return prediction.item()
 
 def get_clicks_rating(n):
     return 5*(1-0.5**n)
 
 def get_review_rating(in_text):
-    return 3
+    print('Review here ----------------------------------------------', in_text)
+    print('in_text type', type(in_text))
+    OldValue = predict_sentiment(model, str(in_text))
+    print('OldValue', OldValue)
+    # OldValue=0.8
+    OldMax = 1
+    OldMin = 0
+
+    NewMax = 5
+    NewMin = 1
+    
+    OldRange = (OldMax - OldMin)  
+    NewRange = (NewMax - NewMin)  
+    NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
+    NewValue = round(NewValue)
+    print(NewValue)
+    
+    return NewValue
+
 
 def get_net_rating(review_rating,rating,clicks_rating):
     review_rating = float(review_rating)

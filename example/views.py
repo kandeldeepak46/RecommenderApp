@@ -4,7 +4,7 @@ import json
 import requests
 from django.core import serializers
 from django.template.loader import render_to_string
-
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
@@ -91,10 +91,19 @@ def index(request):
         print('-------------------------------userId----------------------')
         print(userId)
         rec_books, heading = get_recommendation(userId)
+        # for 'as you've last checked in' section
+        lastCheckedIn = mydb['userActivity'].aggregate([{"$match":{"user_id": userId}},{"$project":{"activity":{"book_id":1,"activity":{"date_modified":1}}}},{"$unwind":"$activity"},{"$project":{"activity.book_id":1,"date_modified":"$activity.activity.date_modified"}},{"$sort":{"date_modified":-1}},{"$limit" : 1} ])
+        last_check_in = list(lastCheckedIn)
+        last_check_in_book_id = last_check_in[0]['activity']['book_id']
+        for_last_checked_books=mycol.find({"ISBN":last_check_in_book_id})
+        for_last_checked_books=list(for_last_checked_books)
+        last_check_in_book = for_last_checked_books[0]['Book-Title']
+        print('Last Checked In----------------------------', last_check_in_book)
+
 
     else:
         rec_books, heading = get_recommendation(0)
-
+        print("Random Books are: ", len(rec_books))
 
         # Profile.objects.filter(user=request.user).update(fifteenBooks=True)
 
@@ -113,65 +122,65 @@ def index(request):
         shopkeeper = 'no'
 
     
-    if request.method == 'POST' and request.FILES['book_cover']: 
-        form = BookCoverForm(request.POST, request.FILES) 
-        myfile = request.FILES['book_cover']
-        fs = FileSystemStorage()
-        filename = fs.save(myfile.name, myfile)
-        uploaded_file_url = fs.url(filename)
-        bookTitle = request.POST.get('Book-Title')
-        author = request.POST.get('Book-Author')
-        isbn = request.POST.get('ISBN')
-        genre = request.POST.get('genre')
-        description = request.POST.get('description') 
-        print(bookTitle, author, isbn, genre, description)
-        print(uploaded_file_url)
+    if request.method == 'POST' and request.FILES['book_cover']:
+        return HttpResponse(request.body) 
+    #     form = BookCoverForm(request.POST, request.FILES) 
+    #     myfile = request.FILES['book_cover']
+    #     fs = FileSystemStorage()
+    #     filename = fs.save(myfile.name, myfile)
+    #     uploaded_file_url = fs.url(filename)
+    #     bookTitle = request.POST.get('Book-Title')
+    #     author = request.POST.get('Book-Author')
+    #     isbn = request.POST.get('ISBN')
+    #     genre = request.POST.get('genre')
+    #     description = request.POST.get('description') 
+    #     print(bookTitle, author, isbn, genre, description)
+    #     print(uploaded_file_url)
         
-        myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-        mydb = myclient["majorProject"]
-        date_now=datetime.datetime.now()
-        mycol = mydb["bookDataset"]
-        x=mydb['counter'].find({},{"book_count":1,"_id":0})
-        new_book_id=list(x)[0]['book_count']+1
-        a={
-            'ISBN': isbn,
-            'Book-Title': bookTitle,
-            'Book-Author': author,
-            'Image-URL': uploaded_file_url,
-            'description': description,
-            'genres': genre,
-            'date_added':date_now
-        }
-        isRegister=True
-        try:
-            z=mycol.insert(a)
-            mydb['counter'].update({},{"$inc":{"book_count":1}})
-        except:
-            isRegister=False
-        print(isRegister)
-        print(new_book_id)
+    #     myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+    #     mydb = myclient["majorProject"]
+    #     date_now=datetime.datetime.now()
+    #     mycol = mydb["bookDataset"]
+    #     x=mydb['counter'].find({},{"book_count":1,"_id":0})
+    #     new_book_id=list(x)[0]['book_count']+1
+    #     a={
+    #         'Book-Title': bookTitle,
+    #         'Book-Author': author,
+    #         'Image-URL': uploaded_file_url,
+    #         'description': description,
+    #         'genres': genre,
+    #         'date_added':date_now
+    #     }
+    #     isRegister=True
+    #     try:
+    #         z=mycol.update({'ISBN':isbn},a)
+    #         mydb['counter'].update({},{"$inc":{"book_count":1}})
+    #     except:
+    #         isRegister=False
+    #     print(isRegister)
+    #     print(new_book_id)
 
-        if form.is_valid():
-            form.save() 
-            return redirect('index') 
-    else: 
-        form = BookCoverForm() 
-    return render(request, 'example/index.html', {
-        'form': form,
-        'rec_books': rec_books,
-        'recently_added': recently_added,
-        'heading': heading,
-        'top_rated': top_rated_books,
-        'shopkeeper': shopkeeper,  
-        'getData' : {
-                'bookTitle': bookTitle,
-                'bookAuthor': bookAuthor,
-                'genre': genre,
-                'description': description,
-                'ISBN': ISBN,
-                'imageURL': imageURL 
-            }
-    }) 
+    #     if form.is_valid():
+    #         form.save() 
+    #         return redirect('index') 
+    # else: 
+    #     form = BookCoverForm() 
+    # return render(request, 'example/index.html', {
+    #     'form': form,
+    #     'rec_books': rec_books,
+    #     'recently_added': recently_added,
+    #     'heading': heading,
+    #     'top_rated': top_rated_books,
+    #     'shopkeeper': shopkeeper,  
+    #     'getData' : {
+    #             'bookTitle': bookTitle,
+    #             'bookAuthor': bookAuthor,
+    #             'genre': genre,
+    #             'description': description,
+    #             'ISBN': ISBN,
+    #             'imageURL': imageURL 
+    #         }
+    # }) 
 
 
     # if request.method == 'POST':
@@ -218,6 +227,7 @@ def index(request):
             'rec_books': rec_books, 
             'heading': heading,
             'top_rated': top_rated_books, 
+            'last_check_in_book': last_check_in_book,
             'recently_added': recently_added,
             'shopkeeper': shopkeeper, 
             'getData' : {
@@ -230,6 +240,7 @@ def index(request):
             }
 
         })
+
 
 
 
@@ -284,7 +295,7 @@ def detail(request, isbn):
 
     if request.user.is_authenticated:
         if request.method == 'POST':
-         
+        
             click = request.body
 
             if(type(click)!=bytes):
@@ -459,36 +470,130 @@ def detail(request, isbn):
     
     
 def getData(request):
+    print('this is the ice cool summer')
+    isbn_no=""
+    try:
+        myclient = MongoClient("mongodb://localhost:27017")
+        mydbs=myclient['majorProject']
+        barcode_col=mydbs['tempBarcode']
+        book_col=mydbs['bookDataset']
+        x=barcode_col.find({"userId":"3000"}).sort('dateAdded',-1).limit(1)
+        barcode_data=list(x)
+        # isbn_no = str(1250178959)
+        isbn_no=barcode_data[0]['ISBN']
+        print('the isbn no is',isbn_no)
+        y=book_col.find({"isbn13":int(isbn_no)})
+        dataset_book=list(y)
+        if(len(dataset_book)>0):
+            bookTitle =dataset_book[0]['Book-Title'] 
+            bookAuthor =dataset_book[0]['Book-Author'] 
+            genre ="Children" 
+            # genre =dataset_book[0]['genres'] 
+            description =dataset_book[0]['description'] 
+            imageURL =dataset_book[0]['Image-URL'] 
+            request_message ="book already exists on the server database"    
+        else:
+            url = "https://www.googleapis.com/books/v1/volumes?q=" + isbn_no
+            response = requests.get(url)
+            parsed = json.loads(response.text)
+            print("the length is",len(parsed))
+            if(parsed["totalItems"] == 0):
+                print("Couldn't find the book")
+                raise Exception('error')
+            else:
+                bookTitle = parsed["items"][0]["volumeInfo"]["title"]
+                bookAuthor = parsed["items"][0]["volumeInfo"]["authors"]
+                bookAuthor = ", ".join(bookAuthor)
+                genre = parsed["items"][0]["volumeInfo"]["categories"]
+                genre = ", ".join(genre)
+                description = parsed["items"][0]["volumeInfo"]["description"]
+                imageURL = parsed["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
+                request_message="book details fetched from google books api"
+    except Exception as e:
+        print("the exception is ",e)
+        if request.method == 'POST':
+            print("the case of mismatched")
+            bookTitle= "",
+            bookAuthor= "",
+            genre= "",
+            description= "",
+            imageURL= "",
+            request_message="book details could not be fetched"            
+    data = {
+                'bookTitle': bookTitle,
+                'bookAuthor': bookAuthor,
+                'genre': genre,
+                'description': description,
+                'imageURL': imageURL,
+                'ISBN':isbn_no,
+                'request_message':request_message
+            }
+    return JsonResponse(data)
+    # return redirect('index')
 
-    # if 'getData' in request.POST:
-        # send some data to nodeMCU signalling that it can send the barcode data (ISBN) to the django server
-        # do this if django server is able to get the ISBN
-        # isbn_no = 1250178959
-        # isbn_no = str(isbn_no)
 
-        # url = "https://www.googleapis.com/books/v1/volumes?q=" + isbn_no
-        # response = requests.get(url)
-        # parsed = json.loads(response.text)
-        # if(parsed["totalItems"] == 0):
-        #     print("Couldn't find the book")
-        # else:
-        #     bookTitle = parsed["items"][0]["volumeInfo"]["title"]
-        #     bookAuthor = parsed["items"][0]["volumeInfo"]["authors"]
-        #     bookAuthor = ", ".join(bookAuthor)
-        #     genre = parsed["items"][0]["volumeInfo"]["categories"]
-        #     genre = ", ".join(genre)
-        #     description = parsed["items"][0]["volumeInfo"]["description"]
-        #     imageURL = parsed["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
-        #     print(bookTitle)
-
-    if request.method == 'POST':
-        print("Ed Sheeran - Castle On The Hill ")
-
-
-    return redirect('index')
-
-
+def add_book(request):
+    # a=request.POST
+    print('hello world')
+    # return HttpResponse(request.POST)
+    form = BookCoverForm(request.POST, request.FILES) 
+    myfile = request.FILES['book_cover']
+    fs = FileSystemStorage()
+    filename = fs.save(myfile.name, myfile)
+    uploaded_file_url = fs.url(filename)
+    bookTitle = request.POST.get('Book-Title')
+    author = request.POST.get('Book-Author')
+    isbn = request.POST.get('ISBN')
+    genre = request.POST.get('genre')
+    description = request.POST.get('description') 
+    print(bookTitle, author, isbn, genre, description)
+    print(uploaded_file_url)
     
+    # myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+    # mydb = myclient["majorProject"]
+    # date_now=datetime.datetime.now()
+    # mycol = mydb["bookDataset"]
+    # x=mydb['counter'].find({},{"book_count":1,"_id":0})
+    # new_book_id=list(x)[0]['book_count']+1
+    a={
+        'Book-Title': bookTitle,
+        'Book-Author': author,
+        'Image-URL': uploaded_file_url,
+        'description': description,
+        'genres': genre,
+        'date_added':date_now
+    }
+    isRegister=True
+    try:
+        z=mycol.update({'ISBN':isbn},a)
+        mydb['counter'].update({},{"$inc":{"book_count":1}})
+    except:
+        isRegister=False
+    print(isRegister)
+    print(new_book_id)
+
+    if form.is_valid():
+        form.save() 
+        return redirect('index') 
+    else: 
+        form = BookCoverForm() 
+    return render(request, 'example/index.html', {
+        'form': form,
+        'rec_books': rec_books,
+        'recently_added': recently_added,
+        'heading': heading,
+        'top_rated': top_rated_books,
+        'shopkeeper': shopkeeper,  
+        'getData' : {
+                'bookTitle': bookTitle,
+                'bookAuthor': bookAuthor,
+                'genre': genre,
+                'description': description,
+                'ISBN': ISBN,
+                'imageURL': imageURL 
+            }
+    }) 
+
 def search(request):
 
     global book_search_data
@@ -505,4 +610,31 @@ def search(request):
 
     return render(request, 'example/search.html', {'searchResult': book_search_data})
 
+@csrf_exempt
+def barcode(request):
+    if request.method == 'POST':
+        # print(request.body)
+        # print(request.body)
+        data=json.loads(request.body.decode('utf-8'))
+        print("data is ",data)
+        print("type is",type(data))
+        try:
+            apiKey=data['apiKey']
+            if(apiKey!="9GbIKGunRvsEgzOOXAqYXfySvfnEX2WE"):
+                raise Exception('keyerror')
+            userId=data['userId']
+            ISBN=data['ISBN']
+            mydb = client["majorProject"]
+            mycol = mydb["tempBarcode"]
+            mycol.insert({"dateAdded":datetime.datetime.now(),"userId":userId,"ISBN":ISBN})
 
+            response={"status":"okay","message":{'ISBN':ISBN,"state":"okay"}}
+        except:
+            print('hello')
+            response={"status":"error","message":"couldnot parse data input properly"}
+        # data=json.loads(str(request.body))
+        # print("the request body is",request.body.userId,request.body.apiKey,request.body.ISBN)
+        # response={"status":"oay","message":"all is well"}
+        return JsonResponse(response)
+    else:
+        return HttpResponse('you have no authority to access this site')

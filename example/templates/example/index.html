@@ -8,296 +8,309 @@
 
     <div class="container">
 
-        <h4 style="padding:1.5em;">{{ heading }}</h4>
+        <div class="container">
+            <h4 style="padding:1.5em;">{{ heading }}</h4>
+            <div id="carousel1" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner row w-100 mx-auto" role="listbox">
+                    {% for books in rec_books  %}
 
-        <div id="carousel-example" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner row w-100 mx-auto" role="listbox">
-                {% for books in rec_books %}
-
-                {% if forloop.first %}
-                <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3 active">
-                    <div class="card" style="width: 15rem;">
-                        <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
-                            style="width:200; height:300;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{books.bookTitle}}</h5>
-                            <p class="card-text">By {{books.bookAuthor}} </p>
-                            <a href="{% url 'detail' books.ISBN %} "> More </a>
+                    {% if forloop.first %}
+                    <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3 active">
+                        <div class="card" style="width: 15rem;">
+                            <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
+                                style="width:200; height:300;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{books.bookTitle}}</h5>
+                                <p class="card-text">By {{books.bookAuthor}} </p>
+                                <a href="{% url 'detail' books.ISBN %}"> More </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                {% else %}
-                <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="card" style="width: 15rem;">
-                        <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
-                            style="width:200; height:300;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{books.bookTitle}}</h5>
-                            <p class="card-text">By {{books.bookAuthor}}</p>
-                            <a href="{% url 'detail' books.ISBN %} "> More </a>
+                    {% else %}
+                    <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="card" style="width: 15rem;">
+                            <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
+                                style="width:200; height:300;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{books.bookTitle}}</h5>
+                                <p class="card-text">By {{books.bookAuthor}}</p>
+                                <a href="{% url 'detail' books.ISBN %}"> More </a>
+                            </div>
                         </div>
                     </div>
+                    {% endif %}
+
+
+                    {% endfor %}
+
                 </div>
-                {% endif %}
-
-
-                {% endfor %}
-
-            </div>
-            <a class="carousel-control-prev" href="#carousel-example" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#carousel-example" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-        </div>
-    </div>
-
-    <br />
-    <hr />
-
-
-    <div class="container">
-        <h4 style="padding:1.5em;">As you've last checked in:</h4>
-        <div id="lastCheckedIn" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner row w-100 mx-auto" role="listbox">
-                {% for books in top_rated %}
-
-                {% if forloop.first %}
-                <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3 active">
-                    <div class="card" style="width: 15rem;">
-                        <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
-                            style="width:200; height:300;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{books.bookTitle}}</h5>
-                            <p class="card-text">By {{books.bookAuthor}} </p>
-                            <a href="{% url 'detail' books.ISBN %}"> More </a>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="card" style="width: 15rem;">
-                        <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
-                            style="width:200; height:300;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{books.bookTitle}}</h5>
-                            <p class="card-text">By {{books.bookAuthor}}</p>
-                            <a href="{% url 'detail' books.ISBN %}"> More </a>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-
-                {% endfor %}
-
-            </div>
-            <a class="carousel-control-prev" href="#lastCheckedIn" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#lastCheckedIn" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-        </div>
-    </div>
-
-    <br />
-    <hr />
-
-
-    <div class="container">
-        <h4 style="padding:1.5em;">Top Rated</h4>
-        <div id="topRated" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner row w-100 mx-auto" role="listbox">
-                {% for books in top_rated %}
-
-                {% if forloop.first %}
-                <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3 active">
-                    <div class="card" style="width: 15rem;">
-                        <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
-                            style="width:200; height:300;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{books.bookTitle}}</h5>
-                            <p class="card-text">By {{books.bookAuthor}} </p>
-                            <a href="{% url 'detail' books.ISBN %}"> More </a>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="card" style="width: 15rem;">
-                        <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
-                            style="width:200; height:300;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{books.bookTitle}}</h5>
-                            <p class="card-text">By {{books.bookAuthor}}</p>
-                            <a href="{% url 'detail' books.ISBN %}"> More </a>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-
-                {% endfor %}
-
-            </div>
-            <a class="carousel-control-prev" href="#topRated" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#topRated" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-        </div>
-    </div>
-
-    <br />
-    <hr />
-
-    <div class="container">
-        <h4 style="padding:1.5em;">Recently Added</h4>
-        <div id="recentlyAdded" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner row w-100 mx-auto" role="listbox">
-                {% for books in recently_added %}
-
-                {% if forloop.first %}
-                <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3 active">
-                    <div class="card" style="width: 15rem;">
-                        <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
-                            style="width:200; height:300;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{books.bookTitle}}</h5>
-                            <p class="card-text">By {{books.bookAuthor}} </p>
-                            <a href="{% url 'detail' books.ISBN %}"> More </a>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="card" style="width: 15rem;">
-                        <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
-                            style="width:200; height:300;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{books.bookTitle}}</h5>
-                            <p class="card-text">By {{books.bookAuthor}}</p>
-                            <a href="{% url 'detail' books.ISBN %}"> More </a>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-
-                {% endfor %}
-
-            </div>
-            <a class="carousel-control-prev" href="#recentlyAdded" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#recentlyAdded" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-        </div>
-    </div>
-
-</div>
-
-<script>
-    let title = "{{getData.bookTitle}}";
-    console.log(title);
-</script>
-
-
-
-{% endblock %}
-
-
-
-
-{% block addBook %}
-{% if shopkeeper == 'yes' %}
-<li class="nav-item">
-    <a class="nav-link" href="#" data-toggle="modal" data-target="#exampleModal"> Add Book </a>
-</li>
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add Book</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-
-                <form action="{% url 'index' %}" class="form" id="getForm" method="POST">
-                    {% csrf_token %}
-                    <input type="submit" value="Get Data" class="btn btn-primary" name="getData" disabled>
-                </form>
-                <hr />
-
-                <form enctype="multipart/form-data" action="{% url 'index' %}" method="POST" class="form">
-                    {% csrf_token %}
-
-                    <div class="form-group">
-                        <label for="bookImageUpload">Cover image</label>
-                        {{ form}}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="exampleFormControlInput1">Book Name</label>
-                        <input type="text" class="form-control" name="Book-Title" id="bookTitle" placeholder=""
-                            required>
-                        <label for="exampleFormControlInput1">Author</label>
-                        <input type="text" class="form-control" name="Book-Author" id="bookAuthor" placeholder=""
-                            required>
-                        <label for="exampleFormControlInput1">ISBN</label>
-                        <input type="text" class="form-control" name="ISBN" id="ISBN" placeholder="" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleFormControlSelect1">Genre</label>
-                        <select class="form-control" name="genre" id="genre">
-                            <option>Children</option>
-                            <option>Comics, Graphics</option>
-                            <option>Fantasy, Paranormal</option>
-                            <option>Fiction</option>
-                            <option>History, Historical Fiction, Biography</option>
-                            <option>Mystery, Thriller, Crime</option>
-                            <option>Non-Fiction</option>
-                            <option>Poetry</option>
-                            <option>Romance</option>
-                            <option>Young-Adult</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="exampleFormControlTextarea1">Description</label>
-                        <textarea class="form-control" name="description" id="description" rows="3" required></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" name="submitData">Save changes</button>
-                </form>
-
+                <a class="carousel-control-prev" href="#carousel1" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carousel1" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
             </div>
         </div>
+
+        <br />
+        <hr />
+
+        {% if user.is_authenticated %}
+        <div class="container">
+            <h4 style="padding:1.5em;">As you've last checked in {{ last_check_in_book }}</h4>
+            <div id="lastCheckedIn" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner row w-100 mx-auto" role="listbox">
+                    {% for books in rec_books  %}
+
+                    {% if forloop.first %}
+                    <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3 active">
+                        <div class="card" style="width: 15rem;">
+                            <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
+                                style="width:200; height:300;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{books.bookTitle}}</h5>
+                                <p class="card-text">By {{books.bookAuthor}} </p>
+                                <a href="{% url 'detail' books.ISBN %}"> More </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="card" style="width: 15rem;">
+                            <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
+                                style="width:200; height:300;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{books.bookTitle}}</h5>
+                                <p class="card-text">By {{books.bookAuthor}}</p>
+                                <a href="{% url 'detail' books.ISBN %}"> More </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    {% endfor %}
+
+                </div>
+                <a class="carousel-control-prev" href="#lastCheckedIn" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#lastCheckedIn" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+        <br />
+        <hr />
+        {% endif %}
+
+        <div class="container">
+            <h4 style="padding:1.5em;">Top Rated</h4>
+            <div id="topRated" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner row w-100 mx-auto" role="listbox">
+                    {% for books in top_rated %}
+
+                    {% if forloop.first %}
+                    <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3 active">
+                        <div class="card" style="width: 15rem;">
+                            <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
+                                style="width:200; height:300;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{books.bookTitle}}</h5>
+                                <p class="card-text">By {{books.bookAuthor}} </p>
+                                <a href="{% url 'detail' books.ISBN %}"> More </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="card" style="width: 15rem;">
+                            <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
+                                style="width:200; height:300;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{books.bookTitle}}</h5>
+                                <p class="card-text">By {{books.bookAuthor}}</p>
+                                <a href="{% url 'detail' books.ISBN %}"> More </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    {% endfor %}
+
+                </div>
+                <a class="carousel-control-prev" href="#topRated" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#topRated" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+
+        <br />
+        <hr />
+
+        <div class="container">
+            <h4 style="padding:1.5em;">Recently Added</h4>
+            <div id="recentlyAdded" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner row w-100 mx-auto" role="listbox">
+                    {% for books in recently_added %}
+
+                    {% if forloop.first %}
+                    <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3 active">
+                        <div class="card" style="width: 15rem;">
+                            <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
+                                style="width:200; height:300;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{books.bookTitle}}</h5>
+                                <p class="card-text">By {{books.bookAuthor}} </p>
+                                <a href="{% url 'detail' books.ISBN %}"> More </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="carousel-item col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="card" style="width: 15rem;">
+                            <img class="card-img-top" src="{{books.imageURL}}" alt="Card image cap"
+                                style="width:200; height:300;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{books.bookTitle}}</h5>
+                                <p class="card-text">By {{books.bookAuthor}}</p>
+                                <a href="{% url 'detail' books.ISBN %}"> More </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+
+                    {% endfor %}
+
+                </div>
+                <a class="carousel-control-prev" href="#recentlyAdded" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#recentlyAdded" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+
     </div>
-    {% endif %}
+
+    <script>
+        let title = "{{getData.bookTitle}}";
+        console.log(title);
+    </script>
+
+
 
     {% endblock %}
 
 
-    {% block extrajs %}
 
-    <script src="main.js"></script>
-    <script src="getData.js"></script>
 
-    {% endblock %}
+    {% block addBook %}
+    {% if shopkeeper == 'yes' %}
+    <li class="nav-item">
+        <a class="nav-link" href="#" data-toggle="modal" data-target="#exampleModal"> Add Book </a>
+    </li>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Book</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div>
+
+                    </div>
+                    <form action="getData" class="form" id="getForm" method="POST">
+                        {% csrf_token %}
+                        <input type="submit" value="Get Data" class="btn btn-primary" name="getData" disabled>
+                    </form>
+                    <hr />
+
+                    <form enctype="multipart/form-data" action="{% url 'index' %}" method="POST" class="form">
+                        <input type="submit" value="Get Data" class="btn btn-primary" name="getData">
+                        <div style="float: right;color:blue;">
+                            <span id='request_message'>
+
+                            </span> </div>
+                    </form>
+                    <hr />
+
+                    <form enctype="multipart/form-data" action="{% url 'index' %}add_book" method="POST" class="form">
+                        >>>>>>> a90684cd110a199edc502d1254028627e6529014
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <img id="book_image_src" alt="bookSelect" width="110" height="150">
+                            {{ form}}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleFormControlInput1">Book Name</label>
+                            <input type="text" class="form-control" name="Book-Title" id="bookTitle" placeholder=""
+                                required>
+                            <label for="exampleFormControlInput1">Author</label>
+                            <input type="text" class="form-control" name="Book-Author" id="bookAuthor" placeholder=""
+                                required>
+                            <label for="exampleFormControlInput1">ISBN</label>
+                            <input type="text" class="form-control" name="ISBN" id="ISBN" placeholder="" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleFormControlSelect1">Genre</label>
+                            <select class="form-control" name="genre" id="genre">
+                                <option>Children</option>
+                                <option>Comics, Graphics</option>
+                                <option>Fantasy, Paranormal</option>
+                                <option>Fiction</option>
+                                <option>History, Historical Fiction, Biography</option>
+                                <option>Mystery, Thriller, Crime</option>
+                                <option>Non-Fiction</option>
+                                <option>Poetry</option>
+                                <option>Romance</option>
+                                <option>Young-Adult</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleFormControlTextarea1">Description</label>
+                            <textarea class="form-control" name="description" id="description" rows="3"
+                                required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" name="submitData">Save changes</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% endblock %}
+
+
+        {% block extrajs %}
+
+        <script src="main.js"></script>
+        <script src="getData.js"></script>
+
+        {% endblock %}
